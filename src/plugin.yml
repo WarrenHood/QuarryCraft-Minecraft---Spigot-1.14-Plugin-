@@ -1,0 +1,4 @@
+name: QuarryCraft
+version: 0.1
+main: com.nullbyte.quarrycraft.Main
+api-version: 1.14
