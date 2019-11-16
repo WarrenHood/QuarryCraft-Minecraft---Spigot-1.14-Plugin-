@@ -2,7 +2,7 @@
 A spigot  plugin that adds a quarry to minecraft.
 
 
-** Making the quarry**
+**Making the quarry**
 
 Firstly, place down a chest one block above the level at which you want to start mining.
 
@@ -19,7 +19,7 @@ Now shift-left click the chest in the centre.
 
 It will complain that there is no fuel. You can use charcoal, coal, or redstone as fuel. Charcoal is the least efficient, while the next are twice as efficient as the previous. coal blocks and restone blocks may also be used. This is equiavelent to 9 coal or 9 redstone dust.
 
-**Here is a summary of the energy provided by each material:
+**Here is a summary of the energy provided by each material:**
 
 Charcoal - 25 Energy
 Coal - 50 Energy
