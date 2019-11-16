@@ -39,7 +39,7 @@ Simply place chests or double chests anywhere along the iron bars (They must be 
 
 The quarry will then begin to mine.
 
-** Mining Modes**
+**Mining Modes**
 Shift-left-click your centre chest to toggle between classic and ender mining. Ender mining will cost 10 times as much as classic mining, however it will not mine stone, dirt, or grass. Ender mining can also place dirt blocks in place of the blocks it mines to avoid holes in the ground. See the nether star modifier below.
 
 
