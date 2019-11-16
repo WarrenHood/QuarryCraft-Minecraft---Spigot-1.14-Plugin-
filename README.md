@@ -22,9 +22,13 @@ It will complain that there is no fuel. You can use charcoal, coal, or redstone 
 **Here is a summary of the energy provided by each material:**
 
 Charcoal - 25 Energy
+
 Coal - 50 Energy
+
 Redstone - 100 Energy
+
 Coal Block - 450 Energy
+
 Redstone Block - 900 Energy
 
 The quarry will consume energy equivalent to the hardness value of each block it mines.
