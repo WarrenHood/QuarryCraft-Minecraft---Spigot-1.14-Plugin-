@@ -55,4 +55,6 @@ Emerald Blocks- Reduce mining delay by 1 tick for every 4 emerald blocks. Max is
 
 Diamond Blocks - Increases the number of blocks mined at a time by 1 for every diamond block. Max is 36 diamond blocks.
 
+Gold Blocks - Increases the efficiency of the quarry. Max is about 99% efficiency at 100 gold blocks.
+
 Nether Star - Place a single nether star in a chest above the redstone to enable dirt block replacements for mined blocks in the ender mining mode.
