@@ -74,3 +74,8 @@ Sneak right click the centre chest to find out how far down the quarry is mining
 **Resetting the current y-level to the top**
 
 If, for whatever reason, you want the quarry to restart mining at the top. Sneak left click one of the 4 diamond blocks around the centre chest. It will start mining at the top(given that there are now blocks at the top that you want mined) 
+
+**Quarry Protection**
+
+
+Your entire quarry's area is protected from intereraction/block breaking from other players. 
