@@ -14,7 +14,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import net.md_5.bungee.api.ChatColor;
-import net.minecraft.server.v1_14_R1.Entity;
 
 public class Quarry extends BukkitRunnable {
 	Location centreChestLocation;
@@ -31,6 +30,8 @@ public class Quarry extends BukkitRunnable {
 	int miningDelay = 20;
 	int counter = 0;
 	String owner;
+	boolean paused;
+	boolean finished;
 	
 	int emeraldBlocks = 0;
 	int diamondBlocks = 0;
@@ -51,6 +52,19 @@ public class Quarry extends BukkitRunnable {
 		setBounds();
 		platX = minX-1;
 		platZ = minZ-1;
+		paused = false;
+		finished = false;
+	}
+	
+	public void togglePause() {
+		paused = !paused;
+		if(paused)
+			tellOwner(ChatColor.YELLOW + "Your quarry at " + centreChestLocation.toVector().toString() + " has been paused.");
+		else {
+			tellOwner(ChatColor.GREEN + "Your quarry at " + centreChestLocation.toVector().toString() + " is no longer paused.");
+			alerted = false;
+		}
+			
 	}
 	
 	public boolean isOwner(Player p) {
@@ -231,7 +245,12 @@ public class Quarry extends BukkitRunnable {
 	}
 	
 	public void sendProgress() {
-		tellOwner("The quarry is mining at y=" + ChatColor.DARK_GREEN + nextY);
+		if (finished)
+			tellOwner("The quarry is finished at y=" + ChatColor.DARK_BLUE + nextY);
+		else if(!paused)
+			tellOwner("The quarry is mining at y=" + ChatColor.DARK_GREEN + nextY);
+		else
+			tellOwner("The quarry is paused at y=" + ChatColor.YELLOW + nextY);
 	}
 	
 	public boolean isSameCentreChest(Chest someCentreChest) {
@@ -267,6 +286,7 @@ public class Quarry extends BukkitRunnable {
 		nextY = centreChestLocation.getBlockY()-2;
 		nextX = minX;
 		nextZ = minZ;
+		finished = false;
 	}
 	
 	public boolean hasFuel(float amount) {
@@ -553,7 +573,10 @@ public class Quarry extends BukkitRunnable {
 	}
 	
 	public void moveMiningCursor() {
-		if(nextX == maxX && nextY == 0 && nextZ == maxZ) return;
+		if(nextX == maxX && nextY == 0 && nextZ == maxZ) {
+			finished = true;
+			return;
+		}
 		if(nextX == maxX) {
 			// Move to next Z if possible
 			if(nextZ < maxZ) {
@@ -611,6 +634,7 @@ public class Quarry extends BukkitRunnable {
 			if(thisMaterial.equals(Material.AIR )|| thisMaterial.equals(Material.WATER) || thisMaterial.equals(Material.LAVA) || thisMaterial.equals(Material.BEDROCK)) {
 				if(nextX == maxX && nextY == 0 && nextZ == maxZ && !alerted) {
 					alerted = true;
+					finished = true;
 					tellOwner(ChatColor.BLUE + "Your quarry at " + centreChestLocation.toVector().toString() + " is now finished");
 				} 
 					
@@ -661,6 +685,7 @@ public class Quarry extends BukkitRunnable {
 			if(thisMaterial.equals(Material.AIR )|| thisMaterial.equals(Material.WATER) || thisMaterial.equals(Material.LAVA) || thisMaterial.equals(Material.BEDROCK)) {
 				if(nextX == maxX && nextY == 0 && nextZ == maxZ && !alerted) {
 					alerted = true;
+					finished = true;
 					tellOwner(ChatColor.BLUE + "Your quarry at " + centreChestLocation.toVector().toString() + " is now finished");
 				} 
 					
@@ -715,7 +740,7 @@ public class Quarry extends BukkitRunnable {
 	@Override
 	public void run() {
 		if(checkCentreChest()) {
-			if(counter%miningDelay == 0) {
+			if(!paused && counter%miningDelay == 0) {
 				for(int i=0; i<blocksPerTick; i++) {
 					mineNextBlock();
 				}

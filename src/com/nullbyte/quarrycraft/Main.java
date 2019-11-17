@@ -54,8 +54,21 @@ public class Main extends JavaPlugin implements Listener {
 		}
 		
 		if(e.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
-			if(!e.getPlayer().isSneaking()) return;
 			Block clicked = e.getClickedBlock();
+			if(!e.getPlayer().isSneaking()) {
+				if(clicked.getType().equals(Material.DIAMOND_BLOCK) && e.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.AIR)) {
+					for(Quarry q : quarries) {
+						if(q.isIn3x3(clicked)) {
+							q.togglePause();
+							e.setCancelled(true);
+							saveQuarries();
+							return;
+						}
+					}
+				}
+				return;
+			}
+			
 			if(clicked.getType().equals(Material.CHEST)) {
 				Chest centreChest = (Chest) clicked.getState();
 				if(isQuarryLayout(centreChest)) {
@@ -88,7 +101,7 @@ public class Main extends JavaPlugin implements Listener {
 				Chest centreChest = (Chest) clicked.getState();
 				if(isQuarryLayout(centreChest)) {
 					Quarry q = getQuarry(centreChest);
-					if(q != null && e.getPlayer().getItemInHand().getType().equals(Material.AIR)){
+					if(q != null && e.getPlayer().getInventory().getItemInMainHand().getType().equals(Material.AIR)){
 						q.sendProgress();
 						e.setCancelled(true);
 					}
@@ -147,7 +160,7 @@ public class Main extends JavaPlugin implements Listener {
 			int minZ = q.minZ;
 			int maxX = q.maxX;
 			int maxZ = q.maxZ;
-			fileString += quarryLoc.getWorld().getName() + ";" + quarryLoc.getBlockX() + ";" + quarryLoc.getBlockY() + ";" + quarryLoc.getBlockZ() + ";" + minX + ";" + minZ + ";" + maxX + ";" + maxZ + ";" + q.classicMode + ";" + q.owner+"\n";		
+			fileString += quarryLoc.getWorld().getName() + ";" + quarryLoc.getBlockX() + ";" + quarryLoc.getBlockY() + ";" + quarryLoc.getBlockZ() + ";" + minX + ";" + minZ + ";" + maxX + ";" + maxZ + ";" + q.classicMode + ";" + q.owner+";"+q.paused+"\n";		
 		}
 		
 		try {
@@ -184,9 +197,11 @@ public class Main extends JavaPlugin implements Listener {
 				maxX = Integer.parseInt(locString[6]);
 				maxZ = Integer.parseInt(locString[7]);
 				ownerName = locString[9].trim();
+				boolean isPaused = false;
+				if(locString.length == 11) isPaused = locString[10].trim().equals("true");
 				classicMode = locString[8].trim().contentEquals("true");
 				Location quarryLoc = new Location(Bukkit.getWorld(locString[0]), x, y, z);
-				addQuarry(quarryLoc, minX, maxX, minZ, maxZ, classicMode,ownerName);
+				addQuarry(quarryLoc, minX, maxX, minZ, maxZ, classicMode,ownerName, isPaused);
 					
 			} while(currentCoords != null);
 			
@@ -218,9 +233,10 @@ public class Main extends JavaPlugin implements Listener {
 		return false;
 	}
 	
-	public boolean addQuarry(Location centreChestLocation, int minX, int maxX, int minZ, int maxZ, boolean mode, String name) {
+	public boolean addQuarry(Location centreChestLocation, int minX, int maxX, int minZ, int maxZ, boolean mode, String name, boolean paused) {
 		if(centreChestLocation.getWorld().getBlockAt(centreChestLocation).getType().equals(Material.CHEST)) {
 			Quarry quarry = new Quarry((Chest)centreChestLocation.getWorld().getBlockAt(centreChestLocation).getState(), minX, maxX, minZ, maxZ, mode, name);
+			quarry.paused = paused;
 			quarries.add(quarry);
 			quarry.runTaskTimer(plugin, 0, 0);
 			return true;
