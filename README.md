@@ -75,6 +75,14 @@ Sneak right click the centre chest to find out how far down the quarry is mining
 
 If, for whatever reason, you want the quarry to restart mining at the top. Sneak left click one of the 4 diamond blocks around the centre chest. It will start mining at the top(given that there are now blocks at the top that you want mined) 
 
+
+
+**Pausing the quarry**
+
+If you need to pause your quarry, simply left click one of its 4 diamond block with an empty hand.
+
+
+
 **Quarry Protection**
 
 
