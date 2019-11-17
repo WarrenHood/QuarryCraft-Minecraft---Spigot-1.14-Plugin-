@@ -12,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -39,19 +40,58 @@ public class Main extends JavaPlugin implements Listener {
 	
 	@EventHandler
 	public void onPlayerLeftClick(PlayerInteractEvent e) {
+		if(e.getAction().equals(Action.LEFT_CLICK_BLOCK) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+			if(!canInteract(e.getClickedBlock().getLocation(), e.getPlayer())) {
+				e.getPlayer().sendMessage(ChatColor.DARK_RED + "You do not have permission to interact here. This is not your quarry!");
+				e.setCancelled(true);
+				return;
+			}
+			if(e.getAction().equals(Action.LEFT_CLICK_BLOCK) && !canBreak(e.getClickedBlock().getLocation(), e.getPlayer())) {
+				e.getPlayer().sendMessage(ChatColor.DARK_RED + "Sorry, this block may not be broken!");
+				e.setCancelled(true);
+				return;
+			}
+		}
+		
 		if(e.getAction().equals(Action.LEFT_CLICK_BLOCK)) {
 			if(!e.getPlayer().isSneaking()) return;
 			Block clicked = e.getClickedBlock();
 			if(clicked.getType().equals(Material.CHEST)) {
 				Chest centreChest = (Chest) clicked.getState();
 				if(isQuarryLayout(centreChest)) {
-					if(addQuarry(centreChest)) {
+					if(addQuarry(centreChest, e.getPlayer().getName())) {
 						e.getPlayer().sendMessage(ChatColor.GREEN+ "You have created a new quarry.");
+						e.setCancelled(true);
 					}
 					else {
 						e.getPlayer().sendMessage(getQuarry(centreChest).toggleEndermining());
+						e.setCancelled(true);
 					}
 					saveQuarries();
+				}
+			}
+			if(clicked.getType().equals(Material.DIAMOND_BLOCK)) {
+				for(Quarry q : quarries) {
+					if(q.isIn3x3(clicked)) {
+						q.resetMiningCursor();
+						e.getPlayer().sendMessage("Mining cursor reset to y=" + ChatColor.DARK_GREEN + q.nextY);
+						e.setCancelled(true);
+						return;
+					}
+				}
+			}
+		}
+		if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+			if(!e.getPlayer().isSneaking()) return;
+			Block clicked = e.getClickedBlock();
+			if(clicked.getType().equals(Material.CHEST)) {
+				Chest centreChest = (Chest) clicked.getState();
+				if(isQuarryLayout(centreChest)) {
+					Quarry q = getQuarry(centreChest);
+					if(q != null && e.getPlayer().getItemInHand().getType().equals(Material.AIR)){
+						q.sendProgress();
+						e.setCancelled(true);
+					}
 				}
 			}
 		}
@@ -107,7 +147,7 @@ public class Main extends JavaPlugin implements Listener {
 			int minZ = q.minZ;
 			int maxX = q.maxX;
 			int maxZ = q.maxZ;
-			fileString += quarryLoc.getWorld().getName() + ";" + quarryLoc.getBlockX() + ";" + quarryLoc.getBlockY() + ";" + quarryLoc.getBlockZ() + ";" + minX + ";" + minZ + ";" + maxX + ";" + maxZ + ";" + q.classicMode + "\n";		
+			fileString += quarryLoc.getWorld().getName() + ";" + quarryLoc.getBlockX() + ";" + quarryLoc.getBlockY() + ";" + quarryLoc.getBlockZ() + ";" + minX + ";" + minZ + ";" + maxX + ";" + maxZ + ";" + q.classicMode + ";" + q.owner+"\n";		
 		}
 		
 		try {
@@ -131,6 +171,7 @@ public class Main extends JavaPlugin implements Listener {
 			boolean classicMode;
 			int x,y,z;
 			Location currentLocation;
+			String ownerName;
 			do {
 				currentCoords = inFile.readLine();
 				if(currentCoords == null) break;
@@ -142,9 +183,10 @@ public class Main extends JavaPlugin implements Listener {
 				minZ = Integer.parseInt(locString[5]);
 				maxX = Integer.parseInt(locString[6]);
 				maxZ = Integer.parseInt(locString[7]);
+				ownerName = locString[9].trim();
 				classicMode = locString[8].trim().contentEquals("true");
 				Location quarryLoc = new Location(Bukkit.getWorld(locString[0]), x, y, z);
-				addQuarry(quarryLoc, minX, maxX, minZ, maxZ, classicMode);
+				addQuarry(quarryLoc, minX, maxX, minZ, maxZ, classicMode,ownerName);
 					
 			} while(currentCoords != null);
 			
@@ -154,9 +196,21 @@ public class Main extends JavaPlugin implements Listener {
 		}
 	}
 	
-	public boolean addQuarry(Chest centreChest) {
+	public boolean canInteract(Location l, Player p) {
+		for(Quarry q : quarries)
+			if(!q.canInteractAt(l, p)) return false;
+		return true;
+	}
+	
+	public boolean canBreak(Location l, Player p) {
+		for(Quarry q : quarries)
+			if(!q.canBreak(l, p)) return false;
+		return true;
+	}
+	
+	public boolean addQuarry(Chest centreChest, String name) {
 		if(getQuarry(centreChest) == null) {
-			Quarry quarry = new Quarry(centreChest);
+			Quarry quarry = new Quarry(centreChest, name);
 			quarries.add(quarry);
 			quarry.runTaskTimer(plugin, 0, 0);
 			return true;
@@ -164,9 +218,9 @@ public class Main extends JavaPlugin implements Listener {
 		return false;
 	}
 	
-	public boolean addQuarry(Location centreChestLocation, int minX, int maxX, int minZ, int maxZ, boolean mode) {
+	public boolean addQuarry(Location centreChestLocation, int minX, int maxX, int minZ, int maxZ, boolean mode, String name) {
 		if(centreChestLocation.getWorld().getBlockAt(centreChestLocation).getType().equals(Material.CHEST)) {
-			Quarry quarry = new Quarry((Chest)centreChestLocation.getWorld().getBlockAt(centreChestLocation).getState(), minX, maxX, minZ, maxZ, mode);
+			Quarry quarry = new Quarry((Chest)centreChestLocation.getWorld().getBlockAt(centreChestLocation).getState(), minX, maxX, minZ, maxZ, mode, name);
 			quarries.add(quarry);
 			quarry.runTaskTimer(plugin, 0, 0);
 			return true;
@@ -179,7 +233,8 @@ public class Main extends JavaPlugin implements Listener {
 		public void run() {
 			for(Quarry q : quarries)
 				if(q.markedForDeletion || !isQuarryLayout(q.centreChest)) {
-					Bukkit.broadcastMessage(ChatColor.DARK_RED + "Quarry at " + q.centreChestLocation.toVector().toString() + " destroyed");
+					q.clearPlatform();
+					q.tellOwner(ChatColor.DARK_RED + "Quarry at " + q.centreChestLocation.toVector().toString() + " destroyed");
 					removeQuarry(q);
 					return;
 				}
