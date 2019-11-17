@@ -2,6 +2,9 @@
 A spigot  plugin that adds a quarry to minecraft.
 
 
+View this plugin on SpigotMC: https://www.spigotmc.org/resources/quarrycraft.72765/
+
+
 **Making the quarry**
 
 Firstly, place down a chest one block above the level at which you want to start mining.
@@ -40,7 +43,7 @@ Simply place chests or double chests anywhere along the iron bars (They must be 
 The quarry will then begin to mine.
 
 **Mining Modes**
-Shift-left-click your centre chest to toggle between classic and ender mining. Ender mining will cost 10 times as much as classic mining, however it will not mine stone, dirt, or grass. Ender mining can also place dirt blocks in place of the blocks it mines to avoid holes in the ground. See the nether star modifier below.
+Shift-left-click your centre chest to toggle between classic and ender mining. Ender mining will cost 50 times as much as classic mining, however it will not mine stone, dirt, or grass. Ender mining can also place dirt blocks in place of the blocks it mines to avoid holes in the ground. See the nether star modifier below.
 
 
 **Modifiers**
@@ -58,3 +61,16 @@ Diamond Blocks - Increases the number of blocks mined at a time by 1 for every d
 Gold Blocks - Increases the efficiency of the quarry. Max is about 99% efficiency at 100 gold blocks.
 
 Nether Star - Place a single nether star in a chest above the redstone to enable dirt block replacements for mined blocks in the ender mining mode.
+
+**Block Filters**
+
+Place a shulker shell on any of the redstone corners. Then place blocks you want to void into the shulker shell. The quarry will still mine all the blocks it usually does and use the same energy, but it will save you space so your chests won't be full of blocks you don't want.
+
+
+**Viewing the current y-level the quarry is mining on**
+
+Sneak right click the centre chest to find out how far down the quarry is mining at the moment.
+
+**Resetting the current y-level to the top**
+
+If, for whatever reason, you want the quarry to restart mining at the top. Sneak left click one of the 4 diamond blocks around the centre chest. It will start mining at the top(given that there are now blocks at the top that you want mined) 
