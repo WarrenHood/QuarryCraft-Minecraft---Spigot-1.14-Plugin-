@@ -71,6 +71,11 @@ public class Quarry extends BukkitRunnable {
 		return (owner != null) && p.getName().equals(owner);
 	}
 	
+	public boolean pistonAllowed(int x, int y, int z) {
+		if(x >= minX-3 && x <= maxX + 3 && z >= minZ-3 && z <= maxZ+3 && y >= centreChestLocation.getBlockY()-3 && y <= centreChestLocation.getBlockY() + 3) return false;
+		return true;
+	}
+	
 	public Quarry(Chest centreChest, int minX, int maxX, int minZ, int maxZ, boolean mode, String owner) {
 		this(centreChest, owner);
 		classicMode = mode;
@@ -129,7 +134,6 @@ public class Quarry extends BukkitRunnable {
 					}
 						
 				}
-					
 				//}
 				
 			}
@@ -155,6 +159,9 @@ public class Quarry extends BukkitRunnable {
 		
 	}
 	
+	public boolean ptIntersects(int x, int z) {
+		return x >= minX - 1 && x <= maxX + 1 && z >= minZ - 1 && z <= maxZ + 1;
+	}
 	
 	public void clearPlatform() {
 		for(int x=minX-1; x <=maxX+1; x++) {

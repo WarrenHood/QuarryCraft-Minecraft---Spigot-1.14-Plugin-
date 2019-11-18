@@ -16,6 +16,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockPistonEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -36,6 +39,26 @@ public class Main extends JavaPlugin implements Listener {
 		quarries = new ArrayList<Quarry>();
 		loadQuarries();
 		new QuarryCleaner().runTaskTimer(plugin, 10, 10);
+	}
+	
+	@EventHandler
+	public void pistonRetractEvent(BlockPistonRetractEvent e) {
+		Location ploc = e.getBlock().getLocation();
+		if(!pistonAllowed(ploc.getBlockX(), ploc.getBlockY(), ploc.getBlockZ())) {
+			//Bukkit.broadcastMessage("Cancelling retract event");
+			e.setCancelled(true);
+		}
+			
+	}
+	
+	@EventHandler
+	public void pistonExtendEvent(BlockPistonExtendEvent e) {
+		Location ploc = e.getBlock().getLocation();
+		if(!pistonAllowed(ploc.getBlockX(), ploc.getBlockY(), ploc.getBlockZ())) {
+			//Bukkit.broadcastMessage("Cancelling extend event");
+			e.setCancelled(true);
+		}
+			
 	}
 	
 	@EventHandler
@@ -76,8 +99,12 @@ public class Main extends JavaPlugin implements Listener {
 						e.getPlayer().sendMessage(ChatColor.GREEN+ "You have created a new quarry.");
 						e.setCancelled(true);
 					}
-					else {
+					else if(getQuarry(centreChest) != null){
 						e.getPlayer().sendMessage(getQuarry(centreChest).toggleEndermining());
+						e.setCancelled(true);
+					}
+					else {
+						e.getPlayer().sendMessage(ChatColor.DARK_RED + "Quarries may not intersect!");
 						e.setCancelled(true);
 					}
 					saveQuarries();
@@ -135,6 +162,23 @@ public class Main extends JavaPlugin implements Listener {
 			if(quarry.isSameCentreChest(centreChest)) return quarry;
 		}
 		return null;
+	}
+	
+	public boolean ptIntersects(int x, int z) {
+		for (Quarry q : quarries)
+			if(q.ptIntersects(x, z)) return true;
+		return false;
+	}
+	
+	public boolean quarryIntersects(Quarry qc) {
+		for(Quarry q : quarries) {
+			if(qc.centreChestLocation.equals(q.centreChestLocation)) continue;
+			if(qc.ptIntersects(q.minX, q.minZ)) return true;
+			if(qc.ptIntersects(q.minX, q.maxZ)) return true;
+			if(qc.ptIntersects(q.maxX, q.minZ)) return true;
+			if(qc.ptIntersects(q.maxX, q.maxZ)) return true;
+		}
+		return false;
 	}
 	
 	public void removeQuarry(Quarry q) {
@@ -233,9 +277,17 @@ public class Main extends JavaPlugin implements Listener {
 		return true;
 	}
 	
+	public boolean pistonAllowed(int x, int y, int z) {
+		for(Quarry q: quarries) {
+			if(!q.pistonAllowed(x, y, z)) return false;
+		}
+		return true;
+	}
+	
 	public boolean addQuarry(Chest centreChest, String name) {
 		if(getQuarry(centreChest) == null) {
 			Quarry quarry = new Quarry(centreChest, name);
+			if(quarryIntersects(quarry)) return false;
 			quarries.add(quarry);
 			quarry.runTaskTimer(plugin, 0, 0);
 			return true;
@@ -246,6 +298,9 @@ public class Main extends JavaPlugin implements Listener {
 	public boolean addQuarry(Location centreChestLocation, int minX, int maxX, int minZ, int maxZ, boolean mode, String name, boolean paused) {
 		if(centreChestLocation.getWorld().getBlockAt(centreChestLocation).getType().equals(Material.CHEST)) {
 			Quarry quarry = new Quarry((Chest)centreChestLocation.getWorld().getBlockAt(centreChestLocation).getState(), minX, maxX, minZ, maxZ, mode, name);
+			if(quarryIntersects(quarry)) {
+				return false;
+			}
 			quarry.paused = paused;
 			quarries.add(quarry);
 			quarry.runTaskTimer(plugin, 0, 0);
