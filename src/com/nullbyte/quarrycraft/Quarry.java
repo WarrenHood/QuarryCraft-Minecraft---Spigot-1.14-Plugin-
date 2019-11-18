@@ -664,6 +664,7 @@ public class Quarry extends BukkitRunnable {
 					}
 				}
 				else {
+					paused = true;
 					if(!alerted) {
 						alerted = true;
 						tellOwner(ChatColor.RED + "Your quarry at " + centreChestLocation.toVector().toString() + " has no space for new items and is now paused.");
@@ -671,6 +672,7 @@ public class Quarry extends BukkitRunnable {
 				}
 			}
 			else {
+				paused = true;
 				if(!alerted) {
 					alerted = true;
 					tellOwner(ChatColor.RED + "Your quarry at " + centreChestLocation.toVector().toString() + " has run out of fuel and is now paused.");
@@ -719,6 +721,7 @@ public class Quarry extends BukkitRunnable {
 					}
 				}
 				else {
+					paused = true;
 					if(!alerted) {
 						alerted = true;
 						tellOwner(ChatColor.RED + "Your quarry at " + centreChestLocation.toVector().toString() + " has no space for new items and is now paused.");
@@ -726,6 +729,7 @@ public class Quarry extends BukkitRunnable {
 				}
 			}
 			else {
+				paused = true;
 				if(!alerted) {
 					alerted = true;
 					tellOwner(ChatColor.RED + "Your quarry at " + centreChestLocation.toVector().toString() + " has run out of fuel and is now paused.");

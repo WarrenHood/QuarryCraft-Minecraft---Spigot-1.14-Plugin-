@@ -149,65 +149,75 @@ public class Main extends JavaPlugin implements Listener {
 	}
 	
 	public void saveQuarries() {
-		String fileSeparator = System.getProperty("file.separator");
-		String path = "plugins" + fileSeparator + "QuarryCraft" + fileSeparator + "quarries.txt";
-		File quarryFile = new File(path);
-		quarryFile.delete();
-		String fileString = "";
-		for(Quarry q : quarries) {
-			Location quarryLoc = q.getLocation();
-			int minX = q.minX;
-			int minZ = q.minZ;
-			int maxX = q.maxX;
-			int maxZ = q.maxZ;
-			fileString += quarryLoc.getWorld().getName() + ";" + quarryLoc.getBlockX() + ";" + quarryLoc.getBlockY() + ";" + quarryLoc.getBlockZ() + ";" + minX + ";" + minZ + ";" + maxX + ";" + maxZ + ";" + q.classicMode + ";" + q.owner+";"+q.paused+"\n";		
+		for(World w : Bukkit.getWorlds()) {
+			String wName = w.getName();
+			String fileSeparator = System.getProperty("file.separator");
+			File folder = new File(wName + fileSeparator + "QuarryCraft");
+			folder.mkdir();
+			String path = wName + fileSeparator + "QuarryCraft" + fileSeparator + "quarries.txt";
+			File quarryFile = new File(path);
+			quarryFile.delete();
+			String fileString = "";
+			for(Quarry q : quarries) {
+				Location quarryLoc = q.getLocation();
+				if(!quarryLoc.getWorld().getName().equals(wName)) continue;
+				int minX = q.minX;
+				int minZ = q.minZ;
+				int maxX = q.maxX;
+				int maxZ = q.maxZ;
+				fileString += quarryLoc.getWorld().getName() + ";" + quarryLoc.getBlockX() + ";" + quarryLoc.getBlockY() + ";" + quarryLoc.getBlockZ() + ";" + minX + ";" + minZ + ";" + maxX + ";" + maxZ + ";" + q.classicMode + ";" + q.owner+";"+q.paused+"\n";		
+			}
+			
+			try {
+				FileOutputStream fos = new FileOutputStream(path);
+				fos.write(fileString.getBytes());
+				fos.flush();
+				fos.close();
+			} catch (IOException e) {
+				//e.printStackTrace();
+			}
 		}
 		
-		try {
-			FileOutputStream fos = new FileOutputStream(path);
-			fos.write(fileString.getBytes());
-			fos.flush();
-			fos.close();
-		} catch (IOException e) {
-			//e.printStackTrace();
-		}
 	}
 	
 	public void loadQuarries() {
-		String fileSeparator = System.getProperty("file.separator");
-		String path = "plugins" + fileSeparator + "QuarryCraft" + fileSeparator + "quarries.txt";
-		try {
-			BufferedReader inFile = new BufferedReader(new FileReader(path));
-			String currentCoords;
-			String[] locString;
-			int minX, minZ, maxX, maxZ;
-			boolean classicMode;
-			int x,y,z;
-			Location currentLocation;
-			String ownerName;
-			do {
-				currentCoords = inFile.readLine();
-				if(currentCoords == null) break;
-				locString = currentCoords.split(";");
-				x = Integer.parseInt(locString[1]);
-				y = Integer.parseInt(locString[2]);
-				z = Integer.parseInt(locString[3]);
-				minX = Integer.parseInt(locString[4]);
-				minZ = Integer.parseInt(locString[5]);
-				maxX = Integer.parseInt(locString[6]);
-				maxZ = Integer.parseInt(locString[7]);
-				ownerName = locString[9].trim();
-				boolean isPaused = false;
-				if(locString.length == 11) isPaused = locString[10].trim().equals("true");
-				classicMode = locString[8].trim().contentEquals("true");
-				Location quarryLoc = new Location(Bukkit.getWorld(locString[0]), x, y, z);
-				addQuarry(quarryLoc, minX, maxX, minZ, maxZ, classicMode,ownerName, isPaused);
-					
-			} while(currentCoords != null);
-			
-			saveQuarries();
-		} catch (IOException e) {
-			//e.printStackTrace();
+		for(World w : Bukkit.getWorlds()) {
+			String wName = w.getName();
+			String fileSeparator = System.getProperty("file.separator");
+			String path = wName + fileSeparator + "QuarryCraft" + fileSeparator + "quarries.txt";
+			try {
+				BufferedReader inFile = new BufferedReader(new FileReader(path));
+				String currentCoords;
+				String[] locString;
+				int minX, minZ, maxX, maxZ;
+				boolean classicMode;
+				int x,y,z;
+				Location currentLocation;
+				String ownerName;
+				do {
+					currentCoords = inFile.readLine();
+					if(currentCoords == null) break;
+					locString = currentCoords.split(";");
+					x = Integer.parseInt(locString[1]);
+					y = Integer.parseInt(locString[2]);
+					z = Integer.parseInt(locString[3]);
+					minX = Integer.parseInt(locString[4]);
+					minZ = Integer.parseInt(locString[5]);
+					maxX = Integer.parseInt(locString[6]);
+					maxZ = Integer.parseInt(locString[7]);
+					ownerName = locString[9].trim();
+					boolean isPaused = false;
+					if(locString.length == 11) isPaused = locString[10].trim().equals("true");
+					classicMode = locString[8].trim().contentEquals("true");
+					Location quarryLoc = new Location(Bukkit.getWorld(locString[0]), x, y, z);
+					addQuarry(quarryLoc, minX, maxX, minZ, maxZ, classicMode,ownerName, isPaused);
+						
+				} while(currentCoords != null);
+				
+				saveQuarries();
+			} catch (IOException e) {
+				//e.printStackTrace();
+			}
 		}
 	}
 	
