@@ -1,4 +1,8 @@
 name: QuarryCraft
-version: 0.9
+version: 1.0
 main: com.nullbyte.quarrycraft.Main
 api-version: 1.14
+commands:
+   quarrycraft:
+      guide:
+         description: Gives the player a QuarryCraft guide book

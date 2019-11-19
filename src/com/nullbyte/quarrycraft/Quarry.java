@@ -1,4 +1,6 @@
 package com.nullbyte.quarrycraft;
+import java.util.ArrayList;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -39,6 +41,9 @@ public class Quarry extends BukkitRunnable {
 	boolean platformDone;
 	int platX,platZ;
 	
+	private ArrayList<String> playersWithAccess;
+	// TODO: Add command to let other players use quarry
+	
 	float energyMod = 1.0f;
 	
 	static Material[] ignored = {Material.BEDROCK, Material.AIR, Material.WATER, Material.LAVA, Material.GRASS, Material.GRASS_BLOCK, Material.GRASS_PATH, Material.STONE, Material.COBBLESTONE, Material.DIRT, Material.COARSE_DIRT};
@@ -62,6 +67,22 @@ public class Quarry extends BukkitRunnable {
 			tellOwner(ChatColor.YELLOW + "Your quarry at " + centreChestLocation.toVector().toString() + " has been paused.");
 		else {
 			tellOwner(ChatColor.GREEN + "Your quarry at " + centreChestLocation.toVector().toString() + " is no longer paused.");
+			alerted = false;
+		}
+			
+	}
+	
+	public void togglePause(Player p) {
+		paused = !paused;
+		
+		if(paused) {
+			p.sendMessage(ChatColor.YELLOW + "Your quarry at " + centreChestLocation.toVector().toString() + " has been paused.");
+			if(!isOwner(p)) tellOwner(ChatColor.YELLOW + "Your quarry at " + centreChestLocation.toVector().toString() + " has been paused.");
+		}
+			
+		else {
+			p.sendMessage(ChatColor.GREEN + "Your quarry at " + centreChestLocation.toVector().toString() + " is no longer paused.");
+			if(!isOwner(p)) tellOwner(ChatColor.GREEN + "Your quarry at " + centreChestLocation.toVector().toString() + " is no longer paused.");
 			alerted = false;
 		}
 			
@@ -159,8 +180,8 @@ public class Quarry extends BukkitRunnable {
 		
 	}
 	
-	public boolean ptIntersects(int x, int z) {
-		return x >= minX - 1 && x <= maxX + 1 && z >= minZ - 1 && z <= maxZ + 1;
+	public boolean ptIntersects(World w, int x, int z) {
+		return w.getName().equals(world) && x >= minX - 1 && x <= maxX + 1 && z >= minZ - 1 && z <= maxZ + 1;
 	}
 	
 	public void clearPlatform() {
@@ -258,6 +279,15 @@ public class Quarry extends BukkitRunnable {
 			tellOwner("The quarry is mining at y=" + ChatColor.DARK_GREEN + nextY);
 		else
 			tellOwner("The quarry is paused at y=" + ChatColor.YELLOW + nextY);
+	}
+	
+	public void sendProgress(Player p) {
+		if (finished)
+			p.sendMessage("The quarry is finished at y=" + ChatColor.DARK_BLUE + nextY);
+		else if(!paused)
+			p.sendMessage("The quarry is mining at y=" + ChatColor.DARK_GREEN + nextY);
+		else
+			p.sendMessage("The quarry is paused at y=" + ChatColor.YELLOW + nextY);
 	}
 	
 	public boolean isSameCentreChest(Chest someCentreChest) {
@@ -455,6 +485,22 @@ public class Quarry extends BukkitRunnable {
 				}
 			}
 			
+			// Check for chest at y+1
+			if(world.getBlockAt(x, y+1, cz).getType().equals(Material.CHEST) || world.getBlockAt(x, y+1, cz).getType().equals(Material.TRAPPED_CHEST)) {
+				Chest chest = (Chest)world.getBlockAt(x, y+1, cz).getState();
+				Inventory chestInv = chest.getInventory();
+				for(int i=0; i<chestInv.getSize(); i++) {
+					if(chestInv.getItem(i) != null && chestInv.getItem(i).getType().equals(mat) && chestInv.getItem(i).getAmount() < 64) {
+						chestInv.getItem(i).setAmount(chestInv.getItem(i).getAmount()+1);
+						return true;
+					}
+					if(chestInv.getItem(i) == null || chestInv.getItem(i).getAmount() == 0) {
+						chestInv.setItem(i, new ItemStack(mat));
+						return true;
+					}
+				}
+			}
+			
 		}
 		
 		// Do z = minZ to maxZ for x=cx
@@ -482,6 +528,22 @@ public class Quarry extends BukkitRunnable {
 			// Check for chest at cx+1
 			if(world.getBlockAt(cx+1, y, z).getType().equals(Material.CHEST) || world.getBlockAt(cx+1, y, z).getType().equals(Material.TRAPPED_CHEST)) {
 				Chest chest = (Chest)world.getBlockAt(cx+1, y, z).getState();
+				Inventory chestInv = chest.getInventory();
+				for(int i=0; i<chestInv.getSize(); i++) {
+					if(chestInv.getItem(i) != null && chestInv.getItem(i).getType().equals(mat) && chestInv.getItem(i).getAmount() < 64) {
+						chestInv.getItem(i).setAmount(chestInv.getItem(i).getAmount()+1);
+						return true;
+					}
+					if(chestInv.getItem(i) == null || chestInv.getItem(i).getAmount() == 0) {
+						chestInv.setItem(i, new ItemStack(mat));
+						return true;
+					}
+				}
+			}
+			
+			// Check for chest at y+1
+			if(world.getBlockAt(cx, y+1, z).getType().equals(Material.CHEST) || world.getBlockAt(cx, y+1, z).getType().equals(Material.TRAPPED_CHEST)) {
+				Chest chest = (Chest)world.getBlockAt(cx, y+1, z).getState();
 				Inventory chestInv = chest.getInventory();
 				for(int i=0; i<chestInv.getSize(); i++) {
 					if(chestInv.getItem(i) != null && chestInv.getItem(i).getType().equals(mat) && chestInv.getItem(i).getAmount() < 64) {
@@ -547,6 +609,7 @@ public class Quarry extends BukkitRunnable {
 	}
 	
 	public boolean canInteractAt(Location l, Player p) {
+		if(p.isOp()) return true;
 		if(isOwner(p)) {
 			return true;
 		}
@@ -555,7 +618,7 @@ public class Quarry extends BukkitRunnable {
 	}
 	
 	public boolean canBreak(Location l, Player p) {
-		if(isOwner(p)) {
+		if(isOwner(p) || p.isOp()) {
 			if(l.getBlockX() >= minX-1 && l.getBlockX() <= maxX+1 && l.getBlockZ() >= minZ-1 && l.getBlockZ() <= maxZ+1 && l.getBlockY() == centreChestLocation.getBlockY()-1) return false;
 			return true;
 		}
