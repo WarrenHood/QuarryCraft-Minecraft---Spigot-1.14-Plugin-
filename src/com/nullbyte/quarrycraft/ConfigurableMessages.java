@@ -100,7 +100,7 @@ public class ConfigurableMessages {
 		playerJoin2 = ChatColor.GREEN + "[QuarryCraft] " +ChatColor.WHITE + "This server has QuarryCraft installed.";
 		playerJoin3 = ChatColor.GREEN + "[QuarryCraft] " +ChatColor.WHITE + "Type " + ChatColor.BLUE + "/quarrycraft guide" + ChatColor.WHITE + " to get started!";
 		
-		loadMessages();
+		//loadMessages();
 	}
 	
 	
@@ -454,7 +454,7 @@ public class ConfigurableMessages {
 				fos.flush();
 				fos.close();
 			} catch (IOException e1) {
-				e1.printStackTrace();
+				//e1.printStackTrace();
 			}
 		}
 	}

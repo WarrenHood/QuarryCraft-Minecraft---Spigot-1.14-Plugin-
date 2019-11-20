@@ -156,6 +156,9 @@ public class Main extends JavaPlugin implements Listener {
 	
 	@Override
 	public void onEnable() {
+		String fileSeparator = System.getProperty("file.separator");
+		File pluginDir = new File("plugins" + fileSeparator + "QuarryCraft");
+		pluginDir.mkdir();
 		Bukkit.getServer().getPluginManager().registerEvents(this, this);
 		this.plugin = this;
 		configurableMessages = new ConfigurableMessages();
@@ -167,9 +170,7 @@ public class Main extends JavaPlugin implements Listener {
 		getCommand("quarrycraft").setExecutor(new guideCommand());
 		getCommand("quarrycraft").setTabCompleter(new QuarryCraftTabCompleter());
 		
-		String fileSeparator = System.getProperty("file.separator");
-		File pluginDir = new File("plugins" + fileSeparator + "QuarryCraft");
-		pluginDir.mkdir();
+		
 		quarries = new ArrayList<Quarry>();
 		
 		loadQuarries();
@@ -537,7 +538,7 @@ public class Main extends JavaPlugin implements Listener {
 				fos.flush();
 				fos.close();
 			} catch (IOException e1) {
-				e1.printStackTrace();
+				//e1.printStackTrace();
 			}
 		}
 	}
