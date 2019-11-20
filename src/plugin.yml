@@ -1,8 +1,27 @@
 name: QuarryCraft
-version: 1.0
+version: 1.1.2
 main: com.nullbyte.quarrycraft.Main
 api-version: 1.14
 commands:
    quarrycraft:
       guide:
          description: Gives the player a QuarryCraft guide book
+permissions:
+   quarrycraft.*:
+      description: Grants all quarrycraft permissions
+      children:
+         quarrycraft.buildquarries: true
+         quarrycraft.use: true
+         quarrycraft.useall: false
+      
+   quarrycraft.buildquarries:
+      description: Allows the player to actually make their own quarries
+      default: true
+      
+   quarrycraft.use:
+      description: Allows the player to interact with their own quarries
+      default: true
+   
+   quarrycraft.useall:
+      description: Allows the player to use all quarries
+      default: false

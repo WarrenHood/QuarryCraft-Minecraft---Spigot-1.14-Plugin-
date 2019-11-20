@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -34,29 +35,107 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class Main extends JavaPlugin implements Listener {
 	public JavaPlugin plugin;
 	public ArrayList<Quarry> quarries;
+	
+	GuideBookGiver gbGiver;
+	
+	public static int quarryLimit = 5;
+	public static int maxQuarryWidth = 50;
+	public static int maxQuarryLength = 50;
+	public static boolean welcomeMessages = true;
+	public static long guideBookCooldown = 1000*60*120;
 
 	class guideCommand implements CommandExecutor{
 
 		@Override
 		public boolean onCommand(CommandSender sender, Command cmd, String alias, String[] args) {
-			if(!(sender instanceof Player))
-			return true;
+			if(args.length == 1 && sender.isOp() && args[0].equals("reload")) {
+				sender.sendMessage(ChatColor.GREEN + "[QuarryCraft]" + ChatColor.WHITE + " Reloading QuarryCraft config...");
+				loadConfig();
+				sender.sendMessage(ChatColor.GREEN + "[QuarryCraft]" + ChatColor.WHITE + " Config reloaded");
+				return true;
+			}
 			
+			
+			if(!(sender instanceof Player))
+				return true;
+			
+			Player p = (Player) sender;
 			if(args.length == 1 && args[0].equals("guide")) {
-				Player p = (Player) sender;
-				p.performCommand("give @p written_book{pages:[\"[\\\"\\\",{\\\"text\\\":\\\"QuarryCraft Guide\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"\\\\n\\\\n\\\\n\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nThis plugin was coded by Warren Hood.\\\",\\\"color\\\":\\\"reset\\\"}]\",\"[\\\"\\\",{\\\"text\\\":\\\"\\\\n\\\"},{\\\"text\\\":\\\" \\\\u0020 \\\\u0020 \\\\u0020 \\\",\\\"bold\\\":true,\\\"italic\\\":true},{\\\"text\\\":\\\"Contents\\\",\\\"bold\\\":true,\\\"italic\\\":true,\\\"underlined\\\":true},{\\\"text\\\":\\\"\\\\n\\\\n\\\",\\\"color\\\":\\\"reset\\\"},{\\\"text\\\":\\\"3. Building the quarry\\\",\\\"bold\\\":true,\\\"clickEvent\\\":{\\\"action\\\":\\\"change_page\\\",\\\"value\\\":3}},{\\\"text\\\":\\\"\\\\n\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"7. Fuel\\\",\\\"bold\\\":true,\\\"clickEvent\\\":{\\\"action\\\":\\\"change_page\\\",\\\"value\\\":7}},{\\\"text\\\":\\\"\\\\n\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"8. Fuel Efficiency\\\",\\\"bold\\\":true,\\\"clickEvent\\\":{\\\"action\\\":\\\"change_page\\\",\\\"value\\\":8}},{\\\"text\\\":\\\"\\\\n\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"9. Upgrades\\\",\\\"bold\\\":true,\\\"clickEvent\\\":{\\\"action\\\":\\\"change_page\\\",\\\"value\\\":9}},{\\\"text\\\":\\\"\\\\n\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"12. Block Filters\\\",\\\"bold\\\":true,\\\"clickEvent\\\":{\\\"action\\\":\\\"change_page\\\",\\\"value\\\":12}},{\\\"text\\\":\\\"\\\\n\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"13. Mining Modes\\\",\\\"bold\\\":true,\\\"clickEvent\\\":{\\\"action\\\":\\\"change_page\\\",\\\"value\\\":13}},{\\\"text\\\":\\\"\\\\n\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"14. Pausing the quarry\\\",\\\"bold\\\":true,\\\"clickEvent\\\":{\\\"action\\\":\\\"change_page\\\",\\\"value\\\":14}},{\\\"text\\\":\\\"\\\\n\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"14. Viewing progress\\\",\\\"bold\\\":true,\\\"clickEvent\\\":{\\\"action\\\":\\\"change_page\\\",\\\"value\\\":14}},{\\\"text\\\":\\\"\\\\n\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"15. Video Tutorial\\\",\\\"bold\\\":true,\\\"clickEvent\\\":{\\\"action\\\":\\\"change_page\\\",\\\"value\\\":15}}]\",\"[\\\"\\\",{\\\"text\\\":\\\"Building the quarry\\\",\\\"bold\\\":true,\\\"underlined\\\":true},{\\\"text\\\":\\\"\\\\n\\\\n\\\",\\\"color\\\":\\\"reset\\\"},{\\\"text\\\":\\\"Step 1.\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"\\\\nPlace down a chest\\\\n\\\\n\\\",\\\"color\\\":\\\"reset\\\"},{\\\"text\\\":\\\"Step 2.\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"\\\\nPlace a diamond block against each side of the chest. You will need 4 diamond blocks.\\\\n \\\",\\\"color\\\":\\\"reset\\\"}]\",\"[\\\"\\\",{\\\"text\\\":\\\"Step 3.\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"\\\\nPlace a redstone block in each of the 4 corners.\\\\n\\\\n\\\",\\\"color\\\":\\\"reset\\\"},{\\\"text\\\":\\\"Step 4.\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"\\\\nPlace iron bars running outwards from the diamond blocks. These will define your quarry's mining area. It is only necessary to run it from 2 sides.\\\",\\\"color\\\":\\\"reset\\\"}]\",\"[\\\"\\\",{\\\"text\\\":\\\"Step 5.\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"\\\\nPlace chests on either side of the iron bars or on top of the iron bars for storage of mined items. They must touch the iron bars and be in the defined quarry area.\\\\n\\\\n\\\",\\\"color\\\":\\\"reset\\\"},{\\\"text\\\":\\\"Step 6.\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"\\\\nPlace fuel in the centre chest. (Look on page 7)\\\",\\\"color\\\":\\\"reset\\\"}]\",\"[\\\"\\\",{\\\"text\\\":\\\"\\\\n\\\"},{\\\"text\\\":\\\"Step 6.\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"\\\\nSneak-left-click the chest to create the quarry. It should now begin mining.\\\",\\\"color\\\":\\\"reset\\\"}]\",\"[\\\"\\\",{\\\"text\\\":\\\" \\\\u0020 \\\\u0020 \\\\u0020 \\\\u0020\\\"},{\\\"text\\\":\\\"Fuel\\\",\\\"bold\\\":true,\\\"underlined\\\":true},{\\\"text\\\":\\\"\\\\nQuarries will accept the following types of fuel:\\\\n\\\\n- Charcoal\\\\n- Coal\\\\n- Coal Blocks\\\\n- Redstone\\\\n- Redstone Blocks\\\\n\\\\n \\\",\\\"color\\\":\\\"reset\\\"}]\",\"[\\\"\\\",{\\\"text\\\":\\\" \\\\u0020 \\\\u0020\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"Fuel Efficiency\\\",\\\"bold\\\":true,\\\"underlined\\\":true},{\\\"text\\\":\\\"\\\\n\\\\n\\\",\\\"color\\\":\\\"reset\\\"},{\\\"text\\\":\\\"Redstone\\\",\\\"bold\\\":true},{\\\"text\\\":\\\" is the most efficient(Provides most energy). Redstone blocks are equivalent to 9 redstone dusts.\\\\n\\\",\\\"color\\\":\\\"reset\\\"},{\\\"text\\\":\\\"Coal\\\",\\\"bold\\\":true},{\\\"text\\\":\\\" is half as efficient as redstone. Coal blocks are equivalent to 9 coal.\\\\n\\\",\\\"color\\\":\\\"reset\\\"},{\\\"text\\\":\\\"Charcoal\\\",\\\"bold\\\":true},{\\\"text\\\":\\\" is half as efficient as coal.\\\",\\\"color\\\":\\\"reset\\\"}]\",\"[\\\"\\\",{\\\"text\\\":\\\" \\\\u0020 \\\\u0020 \\\\u0020\\\"},{\\\"text\\\":\\\"Upgrades\\\",\\\"bold\\\":true,\\\"underlined\\\":true},{\\\"text\\\":\\\"\\\\n\\\\nQuarries are upgradeable. Place a chest on of the the 4 redstone corners.\\\\n\\\\n\\\",\\\"color\\\":\\\"reset\\\"},{\\\"text\\\":\\\"Mining delay\\\",\\\"bold\\\":true},{\\\"text\\\":\\\" - A max of 76 emerald blocks can be placed in the upgrade chest to reduce delay between each block(s) mined.\\\\n \\\",\\\"color\\\":\\\"reset\\\"}]\",\"[\\\"\\\",{\\\"text\\\":\\\"Blocks mined at a time\\\",\\\"bold\\\":true},{\\\"text\\\":\\\" - A max of 36 diamond blocks can be placed in the upgrade chest to increase the number of blocks mined after each delay.\\\\n\\\\n\\\",\\\"color\\\":\\\"reset\\\"},{\\\"text\\\":\\\"Efficiency - \\\",\\\"bold\\\":true},{\\\"text\\\":\\\"A max of 100 gold blocks can be placed in the upgrade chest to increase efficiency.\\\",\\\"color\\\":\\\"reset\\\"}]\",\"[\\\"\\\",{\\\"text\\\":\\\"Ender quarry replaces mined blocks with dirt - \\\",\\\"bold\\\":true},{\\\"text\\\":\\\"Place a nether star in the upgrade chest to make ender quarrying replace mined blocks with dirt. This will prevent holes under the ground.\\\",\\\"color\\\":\\\"reset\\\"}]\",\"[\\\"\\\",{\\\"text\\\":\\\" \\\\u0020 \\\\u0020 \\\\u0020\\\"},{\\\"text\\\":\\\"Block Filters\\\",\\\"bold\\\":true,\\\"underlined\\\":true},{\\\"text\\\":\\\"\\\\n\\\\nPlace a shulker box on one of the 4 redstone corners. Then place blocks which you would like to void into this box. Your quarry will still mine those blocks and use energy on them. But it will save storage space!\\\\n \\\",\\\"color\\\":\\\"reset\\\"}]\",\"[\\\"\\\",{\\\"text\\\":\\\" \\\\u0020 \\\\u0020\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"Mining Modes\\\",\\\"bold\\\":true,\\\"underlined\\\":true},{\\\"text\\\":\\\"\\\\n\\\\nSneak-left click your centre chest with an empty hand to toggle between clasic and ender mode. Classic mode mines everything. Ender mode ignores stone, grass and dirt, which is a lot faster, but uses 50x energy.\\\",\\\"color\\\":\\\"reset\\\"}]\",\"[\\\"\\\",{\\\"text\\\":\\\" \\\\u0020 \\\",\\\"bold\\\":true},{\\\"text\\\":\\\"Pausing the Quarry\\\",\\\"bold\\\":true,\\\"underlined\\\":true},{\\\"text\\\":\\\"\\\\n\\\\nLeft click one of the 4 diamond blocks to pause/unpause your quarry.\\\\n\\\\n\\\",\\\"color\\\":\\\"reset\\\"},{\\\"text\\\":\\\"Viewing Quarry Progress\\\",\\\"bold\\\":true,\\\"underlined\\\":true},{\\\"text\\\":\\\"\\\\n\\\\nSneak-right-click the centre chest with an empty hand to view quarry progress.\\\",\\\"color\\\":\\\"reset\\\"}]\",\"[\\\"\\\",{\\\"text\\\":\\\"Resetting mining level\\\",\\\"bold\\\":true,\\\"underlined\\\":true},{\\\"text\\\":\\\"\\\\n\\\\nIf you'd like to make the quarry start mining from the top again, sneak-left-click one of the 4 diamond blocks with an empty hand\\\\n \\\",\\\"color\\\":\\\"reset\\\"}]\",\"[\\\"\\\",{\\\"text\\\":\\\" \\\\u0020 \\\\u0020\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"Video Tutorial\\\",\\\"bold\\\":true,\\\"underlined\\\":true},{\\\"text\\\":\\\"\\\\n\\\\nI also made a video explaining most of this stuff:\\\\n\\\\n\\\",\\\"color\\\":\\\"reset\\\"},{\\\"text\\\":\\\"Watch it on youtube by clicking here.\\\",\\\"clickEvent\\\":{\\\"action\\\":\\\"open_url\\\",\\\"value\\\":\\\"https://www.youtube.com/watch?v=3A0aurYeOUA&feature=youtu.be\\\"}}]\"],title:\"QuarryCraft Guide\",author:\"Warren Hood\",display:{Lore:[\"A guide to building and using QuarryCraft quarries.\"]}}");			
-
+				gbGiver.giveGuideBook(p);
 			}
 			
 			return true;
 		}
-		
 	}
+	
+	class GuideBookGiver{
+		private ArrayList<Date> lastUsed;
+		private ArrayList<Player> playersUsed;
+		
+		public GuideBookGiver() {
+			lastUsed = new ArrayList<Date>();
+			playersUsed = new ArrayList<Player>();
+		}
+		
+		public long getTimeSinceLastUse(Player p) {
+			for(int i=0; i < playersUsed.size(); i++) {
+				Player pl = playersUsed.get(i);
+				if(pl.getName().equals(p.getName()))
+					return new Date().getTime() - lastUsed.get(i).getTime();
+			}
+			return guideBookCooldown + 1;
+		}
+		
+		public int getPlayerIndex(Player p) {
+			for(int i=0; i < playersUsed.size(); i++) {
+				if(playersUsed.get(i).getName().equals(p.getName()))
+					return i;
+			}
+			return -1;
+		}
+		
+		public void giveGuideBook(Player p) {
+			if(getTimeSinceLastUse(p) > guideBookCooldown) {
+				int playerIndex = getPlayerIndex(p);
+				Bukkit.dispatchCommand(Bukkit.getConsoleSender(),"give @a[name="+p.getName()+"] written_book{pages:[\"[\\\"\\\",{\\\"text\\\":\\\"QuarryCraft Guide\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"\\\\n\\\\n\\\\n\\\\n\\\\n\\\\n\\\\n\\\\n\\\\nThis plugin was coded by Warren Hood.\\\",\\\"color\\\":\\\"reset\\\"}]\",\"[\\\"\\\",{\\\"text\\\":\\\"\\\\n\\\"},{\\\"text\\\":\\\" \\\\u0020 \\\\u0020 \\\\u0020 \\\",\\\"bold\\\":true,\\\"italic\\\":true},{\\\"text\\\":\\\"Contents\\\",\\\"bold\\\":true,\\\"italic\\\":true,\\\"underlined\\\":true},{\\\"text\\\":\\\"\\\\n\\\",\\\"color\\\":\\\"reset\\\"},{\\\"text\\\":\\\"3. Building the quarry\\\",\\\"bold\\\":true,\\\"clickEvent\\\":{\\\"action\\\":\\\"change_page\\\",\\\"value\\\":3}},{\\\"text\\\":\\\"\\\\n\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"7. Fuel\\\",\\\"bold\\\":true,\\\"clickEvent\\\":{\\\"action\\\":\\\"change_page\\\",\\\"value\\\":7}},{\\\"text\\\":\\\"\\\\n\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"8. Fuel Efficiency\\\",\\\"bold\\\":true,\\\"clickEvent\\\":{\\\"action\\\":\\\"change_page\\\",\\\"value\\\":8}},{\\\"text\\\":\\\"\\\\n\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"9. Upgrades\\\",\\\"bold\\\":true,\\\"clickEvent\\\":{\\\"action\\\":\\\"change_page\\\",\\\"value\\\":9}},{\\\"text\\\":\\\"\\\\n\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"12. Block Filters\\\",\\\"bold\\\":true,\\\"clickEvent\\\":{\\\"action\\\":\\\"change_page\\\",\\\"value\\\":12}},{\\\"text\\\":\\\"\\\\n\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"13. Mining Modes\\\",\\\"bold\\\":true,\\\"clickEvent\\\":{\\\"action\\\":\\\"change_page\\\",\\\"value\\\":13}},{\\\"text\\\":\\\"\\\\n\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"14. Pausing the quarry\\\",\\\"bold\\\":true,\\\"clickEvent\\\":{\\\"action\\\":\\\"change_page\\\",\\\"value\\\":14}},{\\\"text\\\":\\\"\\\\n\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"14. Viewing progress\\\",\\\"bold\\\":true,\\\"clickEvent\\\":{\\\"action\\\":\\\"change_page\\\",\\\"value\\\":14}},{\\\"text\\\":\\\"\\\\n\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"16. Video Tutorial\\\",\\\"bold\\\":true,\\\"clickEvent\\\":{\\\"action\\\":\\\"change_page\\\",\\\"value\\\":16}}]\",\"[\\\"\\\",{\\\"text\\\":\\\"Building the quarry\\\",\\\"bold\\\":true,\\\"underlined\\\":true},{\\\"text\\\":\\\"\\\\n\\\\n\\\",\\\"color\\\":\\\"reset\\\"},{\\\"text\\\":\\\"Step 1.\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"\\\\nPlace down a chest\\\\n\\\\n\\\",\\\"color\\\":\\\"reset\\\"},{\\\"text\\\":\\\"Step 2.\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"\\\\nPlace a diamond block against each side of the chest. You will need 4 diamond blocks.\\\\n \\\",\\\"color\\\":\\\"reset\\\"}]\",\"[\\\"\\\",{\\\"text\\\":\\\"Step 3.\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"\\\\nPlace a redstone block in each of the 4 corners.\\\\n\\\\n\\\",\\\"color\\\":\\\"reset\\\"},{\\\"text\\\":\\\"Step 4.\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"\\\\nPlace iron bars running outwards from the diamond blocks. These will define your quarry's mining area. It is only necessary to run it from 2 sides.\\\",\\\"color\\\":\\\"reset\\\"}]\",\"[\\\"\\\",{\\\"text\\\":\\\"Step 5.\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"\\\\nPlace chests on either side of the iron bars or on top of the iron bars for storage of mined items. They must touch the iron bars and be in the defined quarry area.\\\\n\\\\n\\\",\\\"color\\\":\\\"reset\\\"},{\\\"text\\\":\\\"Step 6.\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"\\\\nPlace fuel in the centre chest. (Look on page 7)\\\",\\\"color\\\":\\\"reset\\\"}]\",\"[\\\"\\\",{\\\"text\\\":\\\"\\\\n\\\"},{\\\"text\\\":\\\"Step 6.\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"\\\\nSneak-left-click the chest to create the quarry. It should now begin mining.\\\",\\\"color\\\":\\\"reset\\\"}]\",\"[\\\"\\\",{\\\"text\\\":\\\" \\\\u0020 \\\\u0020 \\\\u0020 \\\\u0020\\\"},{\\\"text\\\":\\\"Fuel\\\",\\\"bold\\\":true,\\\"underlined\\\":true},{\\\"text\\\":\\\"\\\\nQuarries will accept the following types of fuel:\\\\n\\\\n- Charcoal\\\\n- Coal\\\\n- Coal Blocks\\\\n- Redstone\\\\n- Redstone Blocks\\\\n\\\\n \\\",\\\"color\\\":\\\"reset\\\"}]\",\"[\\\"\\\",{\\\"text\\\":\\\" \\\\u0020 \\\\u0020\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"Fuel Efficiency\\\",\\\"bold\\\":true,\\\"underlined\\\":true},{\\\"text\\\":\\\"\\\\n\\\\n\\\",\\\"color\\\":\\\"reset\\\"},{\\\"text\\\":\\\"Redstone\\\",\\\"bold\\\":true},{\\\"text\\\":\\\" is the most efficient(Provides most energy). Redstone blocks are equivalent to 9 redstone dusts.\\\\n\\\",\\\"color\\\":\\\"reset\\\"},{\\\"text\\\":\\\"Coal\\\",\\\"bold\\\":true},{\\\"text\\\":\\\" is half as efficient as redstone. Coal blocks are equivalent to 9 coal.\\\\n\\\",\\\"color\\\":\\\"reset\\\"},{\\\"text\\\":\\\"Charcoal\\\",\\\"bold\\\":true},{\\\"text\\\":\\\" is half as efficient as coal.\\\",\\\"color\\\":\\\"reset\\\"}]\",\"[\\\"\\\",{\\\"text\\\":\\\" \\\\u0020 \\\\u0020 \\\\u0020\\\"},{\\\"text\\\":\\\"Upgrades\\\",\\\"bold\\\":true,\\\"underlined\\\":true},{\\\"text\\\":\\\"\\\\n\\\\nQuarries are upgradeable. Place a chest on of the the 4 redstone corners.\\\\n\\\\n\\\",\\\"color\\\":\\\"reset\\\"},{\\\"text\\\":\\\"Mining delay\\\",\\\"bold\\\":true},{\\\"text\\\":\\\" - A max of 76 emerald blocks can be placed in the upgrade chest to reduce delay between each block(s) mined.\\\\n \\\",\\\"color\\\":\\\"reset\\\"}]\",\"[\\\"\\\",{\\\"text\\\":\\\"Blocks mined at a time\\\",\\\"bold\\\":true},{\\\"text\\\":\\\" - A max of 36 diamond blocks can be placed in the upgrade chest to increase the number of blocks mined after each delay.\\\\n\\\\n\\\",\\\"color\\\":\\\"reset\\\"},{\\\"text\\\":\\\"Efficiency - \\\",\\\"bold\\\":true},{\\\"text\\\":\\\"A max of 100 gold blocks can be placed in the upgrade chest to increase efficiency.\\\",\\\"color\\\":\\\"reset\\\"}]\",\"[\\\"\\\",{\\\"text\\\":\\\"Ender quarry replaces mined blocks with dirt - \\\",\\\"bold\\\":true},{\\\"text\\\":\\\"Place a nether star in the upgrade chest to make ender quarrying replace mined blocks with dirt. This will prevent holes under the ground.\\\",\\\"color\\\":\\\"reset\\\"}]\",\"[\\\"\\\",{\\\"text\\\":\\\" \\\\u0020 \\\\u0020 \\\\u0020\\\"},{\\\"text\\\":\\\"Block Filters\\\",\\\"bold\\\":true,\\\"underlined\\\":true},{\\\"text\\\":\\\"\\\\n\\\\nPlace a shulker box on one of the 4 redstone corners. Then place blocks which you would like to void into this box. Your quarry will still mine those blocks and use energy on them. But it will save storage space!\\\\n \\\",\\\"color\\\":\\\"reset\\\"}]\",\"[\\\"\\\",{\\\"text\\\":\\\" \\\\u0020 \\\\u0020\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"Mining Modes\\\",\\\"bold\\\":true,\\\"underlined\\\":true},{\\\"text\\\":\\\"\\\\n\\\\nSneak-left click your centre chest with an empty hand to toggle between clasic and ender mode. Classic mode mines everything. Ender mode ignores stone, grass and dirt, which is a lot faster, but uses 50x energy.\\\",\\\"color\\\":\\\"reset\\\"}]\",\"[\\\"\\\",{\\\"text\\\":\\\" \\\\u0020 \\\",\\\"bold\\\":true},{\\\"text\\\":\\\"Pausing the Quarry\\\",\\\"bold\\\":true,\\\"underlined\\\":true},{\\\"text\\\":\\\"\\\\n\\\\nLeft click one of the 4 diamond blocks to pause/unpause your quarry.\\\\n\\\\n\\\",\\\"color\\\":\\\"reset\\\"},{\\\"text\\\":\\\"Viewing Quarry Progress\\\",\\\"bold\\\":true,\\\"underlined\\\":true},{\\\"text\\\":\\\"\\\\n\\\\nSneak-right-click the centre chest with an empty hand to view quarry progress.\\\",\\\"color\\\":\\\"reset\\\"}]\",\"[\\\"\\\",{\\\"text\\\":\\\"Resetting mining level\\\",\\\"bold\\\":true,\\\"underlined\\\":true},{\\\"text\\\":\\\"\\\\n\\\\nIf you'd like to make the quarry start mining from the top again, sneak-left-click one of the 4 diamond blocks with an empty hand\\\\n \\\",\\\"color\\\":\\\"reset\\\"}]\",\"[\\\"\\\",{\\\"text\\\":\\\" \\\\u0020 \\\\u0020\\\",\\\"bold\\\":true},{\\\"text\\\":\\\"Video Tutorial\\\",\\\"bold\\\":true,\\\"underlined\\\":true},{\\\"text\\\":\\\"\\\\n\\\\nI also made a video explaining most of this stuff:\\\\n\\\\n\\\",\\\"color\\\":\\\"reset\\\"},{\\\"text\\\":\\\"Watch it on youtube by clicking here.\\\",\\\"clickEvent\\\":{\\\"action\\\":\\\"open_url\\\",\\\"value\\\":\\\"https://www.youtube.com/watch?v=3A0aurYeOUA&feature=youtu.be\\\"}}]\"],title:\"QuarryCraft Guide\",author:\"Warren Hood\",display:{Lore:[\"A guide to building and using QuarryCraft quarries.\"]}}");
+				
+				if(playerIndex == -1) {
+					playersUsed.add(p);
+					lastUsed.add(new Date());
+				}
+				else {
+					lastUsed.set(playerIndex, new Date());
+				}
+			}
+			
+			else {
+				p.sendMessage(ChatColor.RED + "Please wait " + (long)(((double)(guideBookCooldown - getTimeSinceLastUse(p)))/1000.0) + " seconds before using that command again!" );
+			}
+		}
+	}
+	
 	class QuarryCraftTabCompleter implements TabCompleter {
 		@Override
 		public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
 			ArrayList<String> ls = new ArrayList<String>();
+			
 			ls.add("guide");
+			if(sender.isOp()) ls.add("reload");
+			
+			/*
+			if(args.length == 1 && args[0].equals("permission") && sender.isOp()) {
+				ls.add("allow");
+				ls.add("deny");
+			}
+			
+			if(args.length == 2 && args[0].equals("permission") && sender.isOp() && (args[1].equals("allow") || args[1].equals("deny")) ) {
+				ls.add("all-online");
+				for(World w : Bukkit.getWorlds())
+					for(Player p : w.getPlayers())
+						ls.add(p.getName());
+			}*/
+			
+			
 			return ls;
 		}
 	}
@@ -64,13 +143,17 @@ public class Main extends JavaPlugin implements Listener {
 	
 	@EventHandler 
 	public void onPlayerJoin(PlayerJoinEvent e) {
-		e.getPlayer().sendMessage(ChatColor.GREEN + "[QuarryCraft] " +ChatColor.WHITE + "Welcome " + e.getPlayer().getName() + "!\n" + ChatColor.GREEN + "[QuarryCraft] " +ChatColor.WHITE + "This server has QuarryCraft installed.\n" + ChatColor.GREEN + "[QuarryCraft] " +ChatColor.WHITE + "Type " + ChatColor.BLUE + "/quarrycraft guide" + ChatColor.WHITE + " to get started!");
+		if(welcomeMessages)
+			e.getPlayer().sendMessage(ChatColor.GREEN + "[QuarryCraft] " +ChatColor.WHITE + "Welcome " + e.getPlayer().getName() + "!\n" + ChatColor.GREEN + "[QuarryCraft] " +ChatColor.WHITE + "This server has QuarryCraft installed.\n" + ChatColor.GREEN + "[QuarryCraft] " +ChatColor.WHITE + "Type " + ChatColor.BLUE + "/quarrycraft guide" + ChatColor.WHITE + " to get started!");
 	}
 	
 	@Override
 	public void onEnable() {
 		Bukkit.getServer().getPluginManager().registerEvents(this, this);
 		this.plugin = this;
+		loadConfig();
+		gbGiver = new GuideBookGiver();
+		
 		
 		getCommand("quarrycraft").setExecutor(new guideCommand());
 		getCommand("quarrycraft").setTabCompleter(new QuarryCraftTabCompleter());
@@ -79,6 +162,7 @@ public class Main extends JavaPlugin implements Listener {
 		File pluginDir = new File("plugins" + fileSeparator + "QuarryCraft");
 		pluginDir.mkdir();
 		quarries = new ArrayList<Quarry>();
+		
 		loadQuarries();
 		new QuarryCleaner().runTaskTimer(plugin, 10, 10);
 	}
@@ -86,7 +170,7 @@ public class Main extends JavaPlugin implements Listener {
 	@EventHandler
 	public void pistonRetractEvent(BlockPistonRetractEvent e) {
 		Location ploc = e.getBlock().getLocation();
-		if(!pistonAllowed(ploc.getBlockX(), ploc.getBlockY(), ploc.getBlockZ())) {
+		if(!pistonAllowed(ploc.getWorld(), ploc.getBlockX(), ploc.getBlockY(), ploc.getBlockZ())) {
 			//Bukkit.broadcastMessage("Cancelling retract event");
 			e.setCancelled(true);
 		}
@@ -96,7 +180,7 @@ public class Main extends JavaPlugin implements Listener {
 	@EventHandler
 	public void pistonExtendEvent(BlockPistonExtendEvent e) {
 		Location ploc = e.getBlock().getLocation();
-		if(!pistonAllowed(ploc.getBlockX(), ploc.getBlockY(), ploc.getBlockZ())) {
+		if(!pistonAllowed(ploc.getWorld(), ploc.getBlockX(), ploc.getBlockY(), ploc.getBlockZ())) {
 			//Bukkit.broadcastMessage("Cancelling extend event");
 			e.setCancelled(true);
 		}
@@ -107,7 +191,7 @@ public class Main extends JavaPlugin implements Listener {
 	public void onPlayerLeftClick(PlayerInteractEvent e) {
 		if(e.getAction().equals(Action.LEFT_CLICK_BLOCK) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
 			if(!canInteract(e.getClickedBlock().getLocation(), e.getPlayer())) {
-				e.getPlayer().sendMessage(ChatColor.DARK_RED + "You do not have permission to interact here. This is not your quarry!");
+				e.getPlayer().sendMessage(ChatColor.DARK_RED + "You do not have permission to interact here.");
 				e.setCancelled(true);
 				return;
 			}
@@ -137,12 +221,20 @@ public class Main extends JavaPlugin implements Listener {
 			if(clicked.getType().equals(Material.CHEST)) {
 				Chest centreChest = (Chest) clicked.getState();
 				if(isQuarryLayout(centreChest)) {
-					if(addQuarry(centreChest, e.getPlayer().getName())) {
+					if(hasPermission(e.getPlayer(),"quarrycraft.buildquarries") && countQuarries(e.getPlayer()) < quarryLimit && addQuarry(centreChest, e.getPlayer().getName())) {
 						e.getPlayer().sendMessage(ChatColor.GREEN+ "You have created a new quarry.");
 						e.setCancelled(true);
 					}
 					else if(getQuarry(centreChest) != null){
 						e.getPlayer().sendMessage(getQuarry(centreChest).toggleEndermining());
+						e.setCancelled(true);
+					}
+					else if(!hasPermission(e.getPlayer(),"quarrycraft.buildquarries")) {
+						e.getPlayer().sendMessage(ChatColor.RED + "You do not have permission to build quarries.\nPlease ask an OP for permission.");
+						e.setCancelled(true);
+					}
+					else if(countQuarries(e.getPlayer()) >= quarryLimit) {
+						e.getPlayer().sendMessage(ChatColor.DARK_RED + "You have reached your quarry limit("+quarryLimit+"). Please destroy old quarries or ask the server owner to change the limit in the QuarryCraft config.");
 						e.setCancelled(true);
 					}
 					else {
@@ -206,19 +298,24 @@ public class Main extends JavaPlugin implements Listener {
 		return null;
 	}
 	
-	public boolean ptIntersects(int x, int z) {
+	public boolean ptIntersects(World w, int x, int z) {
 		for (Quarry q : quarries)
-			if(q.ptIntersects(x, z)) return true;
+			if(q.ptIntersects(w, x, z)) return true;
 		return false;
 	}
 	
 	public boolean quarryIntersects(Quarry qc) {
 		for(Quarry q : quarries) {
 			if(qc.centreChestLocation.equals(q.centreChestLocation)) continue;
-			if(qc.ptIntersects(q.minX, q.minZ)) return true;
-			if(qc.ptIntersects(q.minX, q.maxZ)) return true;
-			if(qc.ptIntersects(q.maxX, q.minZ)) return true;
-			if(qc.ptIntersects(q.maxX, q.maxZ)) return true;
+			World w = qc.world;
+			if(q.ptIntersects(w, qc.minX, qc.minZ)) return true;
+			if(q.ptIntersects(w, qc.minX, qc.maxZ)) return true;
+			if(q.ptIntersects(w, qc.maxX, qc.minZ)) return true;
+			if(q.ptIntersects(w, qc.maxX, qc.maxZ)) return true;
+			if(qc.ptIntersects(q.world, q.minX, q.minZ)) return true;
+			if(qc.ptIntersects(q.world, q.minX, q.maxZ)) return true;
+			if(qc.ptIntersects(q.world, q.maxX, q.minZ)) return true;
+			if(qc.ptIntersects(q.world, q.maxX, q.maxZ)) return true;
 		}
 		return false;
 	}
@@ -307,6 +404,13 @@ public class Main extends JavaPlugin implements Listener {
 		}
 	}
 	
+	public int countQuarries(Player p) {
+		int count = 0;
+		for(Quarry q : quarries)
+			if(q.isOwner(p)) count++;
+		return count;
+	}
+	
 	public boolean canInteract(Location l, Player p) {
 		for(Quarry q : quarries)
 			if(!q.canInteractAt(l, p)) return false;
@@ -319,11 +423,17 @@ public class Main extends JavaPlugin implements Listener {
 		return true;
 	}
 	
-	public boolean pistonAllowed(int x, int y, int z) {
+	public boolean pistonAllowed(World w, int x, int y, int z) {
 		for(Quarry q: quarries) {
-			if(!q.pistonAllowed(x, y, z)) return false;
+			if(!q.pistonAllowed(w, x, y, z)) return false;
 		}
 		return true;
+	}
+	
+	public boolean hasPermission(Player p, String perm) {
+		if(p.isOp()) return true;
+		
+		return p.hasPermission(perm);
 	}
 	
 	public boolean addQuarry(Chest centreChest, String name) {
@@ -361,6 +471,65 @@ public class Main extends JavaPlugin implements Listener {
 					removeQuarry(q);
 					return;
 				}
+		}
+	}
+	
+	public void loadConfig() {
+		String fileSeparator = System.getProperty("file.separator");
+		String path = "plugins" + fileSeparator + "QuarryCraft" + fileSeparator + "config.conf";
+		try {
+			BufferedReader inFile = new BufferedReader(new FileReader(path));
+			String currentString;
+			String[] splitString;
+			String var;
+			String val; 
+			do {
+				currentString = inFile.readLine();
+				if(currentString == null) break;
+				splitString = currentString.split("=");
+				if(splitString == null || splitString.length != 2) continue;
+				var = splitString[0].trim().toLowerCase();
+				val = splitString[1].trim().toLowerCase();
+				
+				switch(var) {
+				case "quarries-per-player":
+					quarryLimit = Integer.parseInt(val);
+					break;
+				case "max-quarry-width":
+					maxQuarryWidth = Integer.parseInt(val);
+					break;
+				case "max-quarry-length":
+					maxQuarryLength = Integer.parseInt(val);
+					break;
+				case "enable-quarrycraft-welcome-message":
+					if(val.equals("false") || val.equals("0"))
+						welcomeMessages = false;
+					break;
+				case "guidebook-cooldown-milliseconds":
+					guideBookCooldown = Long.parseLong(val);
+					break;
+				}
+				
+			} while(currentString != null);
+			inFile.close();
+		} catch (IOException e) {
+			String fileString = "";
+			fileString += "quarries-per-player = " + quarryLimit + "\n\n";
+			fileString += "(Width and length below are multiplied to find the area, then quarry areas are checked against this)\n";
+			fileString += "max-quarry-width = " + maxQuarryWidth + "\n";
+			fileString += "max-quarry-length = " + maxQuarryLength + "\n";
+			fileString += "enable-quarrycraft-welcome-message = " + welcomeMessages + "\n\n";
+			fileString += "guidebook-cooldown-milliseconds = " + guideBookCooldown + "\n";
+			
+			
+			try {
+				FileOutputStream fos = new FileOutputStream(path);
+				fos.write(fileString.getBytes());
+				fos.flush();
+				fos.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		}
 	}
 }

@@ -13,6 +13,7 @@ import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import net.md_5.bungee.api.ChatColor;
@@ -55,6 +56,22 @@ public class Quarry extends BukkitRunnable {
 		world = centreChest.getWorld();
 		storedEnergy = 0;
 		setBounds();
+		if(getArea() > Main.maxQuarryWidth*Main.maxQuarryLength) {
+			tellOwner(ChatColor.DARK_RED + "Your quarry is over the quarry area limit and is being restricted to a " + Main.maxQuarryWidth + "x" + Main.maxQuarryLength + " area.");
+			int xRad = (int)((Math.sqrt(Main.maxQuarryWidth*Main.maxQuarryLength)-1)/2);
+			int zRad = xRad;
+			int cx = centreChestLocation.getBlockX();
+			int cz = centreChestLocation.getBlockZ();
+			
+			minX = cx - xRad;
+			maxX = cx + xRad;
+			minZ = cz - zRad;
+			maxZ = cz + zRad;
+			
+			nextX = minX;
+			nextY = centreChestLocation.getBlockY()-2;
+			nextZ = minZ;
+		}
 		platX = minX-1;
 		platZ = minZ-1;
 		paused = false;
@@ -92,8 +109,8 @@ public class Quarry extends BukkitRunnable {
 		return (owner != null) && p.getName().equals(owner);
 	}
 	
-	public boolean pistonAllowed(int x, int y, int z) {
-		if(x >= minX-3 && x <= maxX + 3 && z >= minZ-3 && z <= maxZ+3 && y >= centreChestLocation.getBlockY()-3 && y <= centreChestLocation.getBlockY() + 3) return false;
+	public boolean pistonAllowed(World w, int x, int y, int z) {
+		if(world.getName().equals(w.getName()) && x >= minX-15 && x <= maxX + 15 && z >= minZ-15 && z <= maxZ+15 && y >= centreChestLocation.getBlockY()-16 && y <= centreChestLocation.getBlockY() + 16) return false;
 		return true;
 	}
 	
@@ -181,7 +198,7 @@ public class Quarry extends BukkitRunnable {
 	}
 	
 	public boolean ptIntersects(World w, int x, int z) {
-		return w.getName().equals(world) && x >= minX - 1 && x <= maxX + 1 && z >= minZ - 1 && z <= maxZ + 1;
+		return w.getName().equals(world.getName()) && x >= minX - 1 && x <= maxX + 1 && z >= minZ - 1 && z <= maxZ + 1;
 	}
 	
 	public void clearPlatform() {
@@ -609,21 +626,25 @@ public class Quarry extends BukkitRunnable {
 	}
 	
 	public boolean canInteractAt(Location l, Player p) {
-		if(p.isOp()) return true;
-		if(isOwner(p)) {
+		if(p.hasPermission("quarrycraft.useall")) return true;
+		if(isOwner(p) && p.hasPermission("quarrycraft.use")) {
 			return true;
 		}
-		if(l.getBlockX() >= minX-1 && l.getBlockX() <= maxX+1 && l.getBlockZ() >= minZ-1 && l.getBlockZ() <= maxZ+1) return false;
+		if(l.getWorld().getName().equals(world.getName()) && l.getBlockX() >= minX-1 && l.getBlockX() <= maxX+1 && l.getBlockZ() >= minZ-1 && l.getBlockZ() <= maxZ+1) return false;
 		return true;
 	}
 	
 	public boolean canBreak(Location l, Player p) {
-		if(isOwner(p) || p.isOp()) {
-			if(l.getBlockX() >= minX-1 && l.getBlockX() <= maxX+1 && l.getBlockZ() >= minZ-1 && l.getBlockZ() <= maxZ+1 && l.getBlockY() == centreChestLocation.getBlockY()-1) return false;
+		if( (isOwner(p) && p.hasPermission("quarrycraft.use")) || p.hasPermission("quarrycraft.useall")) {
+			if(l.getWorld().getName().equals(world.getName()) && l.getBlockX() >= minX-1 && l.getBlockX() <= maxX+1 && l.getBlockZ() >= minZ-1 && l.getBlockZ() <= maxZ+1 && l.getBlockY() == centreChestLocation.getBlockY()-1) return false;
 			return true;
 		}
-		if(l.getBlockX() >= minX-1 && l.getBlockX() <= maxX+1 && l.getBlockZ() >= minZ-1 && l.getBlockZ() <= maxZ+1) return false;
+		if(l.getWorld().getName().equals(world.getName()) && l.getBlockX() >= minX-1 && l.getBlockX() <= maxX+1 && l.getBlockZ() >= minZ-1 && l.getBlockZ() <= maxZ+1) return false;
 		return true;
+	}
+	
+	public int getArea() {
+		return Math.abs(minX-maxX+1)*Math.abs(minZ-maxZ+1);
 	}
 	
 	public void setBounds() {
