@@ -53,6 +53,7 @@ public class ConfigurableMessages {
 	private String playerJoin1;
 	private String playerJoin2;
 	private String playerJoin3;
+	private String mayNotBuildHere;
 	
 	public ConfigurableMessages() {
 		reloading1 = ChatColor.GREEN + "[QuarryCraft]" + ChatColor.WHITE + " Reloading QuarryCraft config...";
@@ -99,7 +100,7 @@ public class ConfigurableMessages {
 		playerJoin1 = ChatColor.GREEN + "[QuarryCraft] " +ChatColor.WHITE + "Welcome ";
 		playerJoin2 = ChatColor.GREEN + "[QuarryCraft] " +ChatColor.WHITE + "This server has QuarryCraft installed.";
 		playerJoin3 = ChatColor.GREEN + "[QuarryCraft] " +ChatColor.WHITE + "Type " + ChatColor.BLUE + "/quarrycraft guide" + ChatColor.WHITE + " to get started!";
-		
+		mayNotBuildHere = ChatColor.RED + "You may not build your quarry here!";
 		//loadMessages();
 	}
 	
@@ -237,7 +238,71 @@ public class ConfigurableMessages {
   public String playerJoin3(){
     return playerJoin3;
   }
+  public String mayNotBuildHere() {
+    return mayNotBuildHere;
+  }
 	
+  public void overwriteCurrent() {
+	  String fileSeparator = System.getProperty("file.separator");
+	  String path = "plugins" + fileSeparator + "QuarryCraft" + fileSeparator + "messages.conf";
+	  String fileString = "";
+		fileString += "reloading1 = " + reloading1 + "\n";
+		fileString += "reloading2 = " + reloading2 + "\n";
+		fileString += "pleaseWaitBeforeNumSeconds = " + pleaseWaitBeforeNumSeconds + "\n";
+		fileString += "pleaseWaitAfterNumSeconds = " + pleaseWaitAfterNumSeconds + "\n";
+		fileString += "dontHaveInteractPermission = " + dontHaveInteractPermission + "\n";
+		fileString += "blockCannotBeBroken = " + blockCannotBeBroken + "\n";
+		fileString += "quarryCreated = " + quarryCreated + "\n";
+		fileString += "noBuildPerm = " + noBuildPerm + "\n";
+		fileString += "quarryLimBeforeLimit = " + quarryLimBeforeLimit + "\n";
+		fileString += "quarryLimAfterLimit = " + quarryLimAfterLimit + "\n";
+		fileString += "quarryIntersectError = " + quarryIntersectError + "\n";
+		fileString += "miningCursorReset = " + miningCursorReset + "\n";
+		fileString += "quarryDestroyedBeforeCoords = " + quarryDestroyedBeforeCoords + "\n";
+		fileString += "quarryDestroyedAfterCoords = " + quarryDestroyedAfterCoords + "\n";
+		fileString += "quarryOversizedBeforeArea = " + quarryOversizedBeforeArea + "\n";
+		fileString += "quarryOversizedAfterArea = " + quarryOversizedAfterArea + "\n";
+		fileString += "quarryPausedBeforeCoords = " + quarryPausedBeforeCoords + "\n";
+		fileString += "quarryPausedAfterCoords = " + quarryPausedAfterCoords + "\n";
+		fileString += "quarryUnpausedBeforeCoords = " + quarryUnpausedBeforeCoords + "\n";
+		fileString += "quarryUnpausedAfterCoords = " + quarryUnpausedAfterCoords + "\n";
+		fileString += "quarryModified = " + quarryModified + "\n";
+		fileString += "miningDelay = " + miningDelay + "\n";
+		fileString += "emeraldBlocksToUpgrade = " + emeraldBlocksToUpgrade + "\n";
+		fileString += "blocksMinedAtATime = " + blocksMinedAtATime + "\n";
+		fileString += "diamondBlocksToUpgrade = " + diamondBlocksToUpgrade + "\n";
+		fileString += "efficiency = " + efficiency + "\n";
+		fileString += "enderReplaceDirt = " + enderReplaceDirt + "\n";
+		fileString += "quarryFinishedStatus = " + quarryFinishedStatus + "\n";
+		fileString += "quarryMiningStatus = " + quarryMiningStatus + "\n";
+		fileString += "quarryPausedStatus = " + quarryPausedStatus + "\n";
+		fileString += "miningModeToggled = " + miningModeToggled + "\n";
+		fileString += "classic = " + classic + "\n";
+		fileString += "ender = " + ender + "\n";
+		fileString += "resumedBeforeCoords = " + resumedBeforeCoords + "\n";
+		fileString += "resumedAfterCoords = " + resumedAfterCoords + "\n";
+		fileString += "noSpaceBeforeCoords = " + noSpaceBeforeCoords + "\n";
+		fileString += "noSpaceAfterCoords = " + noSpaceAfterCoords + "\n";
+		fileString += "noFuelBeforeCoords = " + noFuelBeforeCoords + "\n";
+		fileString += "noFuelAfterCoords = " + noFuelAfterCoords + "\n";
+		fileString += "finishedBeforeCoords = " + finishedBeforeCoords + "\n";
+		fileString += "finishedAfterCoords = " + finishedAfterCoords + "\n";
+		fileString += "playerJoin1 = " + playerJoin1 + "\n";
+		fileString += "playerJoin2 = " + playerJoin2 + "\n";
+		fileString += "playerJoin3 = " + playerJoin3 + "\n";
+		fileString += "mayNotBuildHere = " + mayNotBuildHere + "\n";
+		
+		
+		try {
+			FileOutputStream fos = new FileOutputStream(path);
+			fos.write(fileString.getBytes());
+			fos.flush();
+			fos.close();
+		} catch (IOException e1) {
+			//e1.printStackTrace();
+		}
+  }
+  
 	public void loadMessages() {
 		String fileSeparator = System.getProperty("file.separator");
 		String path = "plugins" + fileSeparator + "QuarryCraft" + fileSeparator + "messages.conf";
@@ -255,7 +320,7 @@ public class ConfigurableMessages {
 				var = splitString[0].trim();
 				val = splitString[1].trim();
 				
-				System.out.println(ChatColor.GREEN + "Loading configurable message" + var + " = " + val);
+				//System.out.println(ChatColor.GREEN + "Loading configurable message" + var + " = " + val);
 				
 				switch(var) {
 				case "reloading1":
@@ -390,6 +455,9 @@ public class ConfigurableMessages {
 				case "playerJoin3":
 				  playerJoin3 = val;
 				  break;
+				case "mayNotBuildHere":
+				  mayNotBuildHere = val;
+				  break;
 				default:
 			      System.out.println(var + " unrecognised! Ignoring"); 
 			      break;
@@ -399,7 +467,7 @@ public class ConfigurableMessages {
 			inFile.close();
 		} catch (IOException e) {
 			//e.printStackTrace();
-			System.out.println(ChatColor.BLUE + "Generating QuarryCraft messages file");
+			//System.out.println(ChatColor.BLUE + "Generating QuarryCraft messages file");
 			String fileString = "";
 			fileString += "reloading1 = " + reloading1 + "\n";
 			fileString += "reloading2 = " + reloading2 + "\n";
@@ -445,7 +513,7 @@ public class ConfigurableMessages {
 			fileString += "playerJoin1 = " + playerJoin1 + "\n";
 			fileString += "playerJoin2 = " + playerJoin2 + "\n";
 			fileString += "playerJoin3 = " + playerJoin3 + "\n";
-			
+			fileString += "mayNotBuildHere = " + mayNotBuildHere + "\n";
 			
 			
 			try {

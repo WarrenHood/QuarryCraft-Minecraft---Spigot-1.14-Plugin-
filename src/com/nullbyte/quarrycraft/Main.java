@@ -28,8 +28,12 @@ import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+
+
+
 
 
 public class Main extends JavaPlugin implements Listener {
@@ -43,6 +47,12 @@ public class Main extends JavaPlugin implements Listener {
 	public static int maxQuarryLength = 50;
 	public static boolean welcomeMessages = true;
 	public static long guideBookCooldown = 1000*60*120;
+	public static boolean doWGProtection = true;
+	public static int maxWGY = 100;
+	public static int minWGY = 20;
+	public static boolean doGPProtection = true;
+	public static int maxGPY = 100;
+	public static int minGPY = 20;
 	
 	public static ConfigurableMessages configurableMessages;
 
@@ -232,11 +242,13 @@ public class Main extends JavaPlugin implements Listener {
 				Chest centreChest = (Chest) clicked.getState();
 				if(isQuarryLayout(centreChest)) {
 					if(hasPermission(e.getPlayer(),"quarrycraft.buildquarries") && countQuarries(e.getPlayer()) < quarryLimit && addQuarry(centreChest, e.getPlayer().getName())) {
-						e.getPlayer().sendMessage(configurableMessages.quarryCreated());
+						if(!getQuarry(centreChest).markedForDeletion)
+							e.getPlayer().sendMessage(configurableMessages.quarryCreated());
 						e.setCancelled(true);
 					}
 					else if(getQuarry(centreChest) != null){
-						e.getPlayer().sendMessage(getQuarry(centreChest).toggleEndermining());
+						if(!getQuarry(centreChest).markedForDeletion)
+							e.getPlayer().sendMessage(getQuarry(centreChest).toggleEndermining());
 						e.setCancelled(true);
 					}
 					else if(!hasPermission(e.getPlayer(),"quarrycraft.buildquarries")) {
@@ -281,7 +293,7 @@ public class Main extends JavaPlugin implements Listener {
 		}
 	}
 	
-	public boolean isQuarryLayout(Chest centreChest) {
+	public static boolean isQuarryLayout(Chest centreChest) {
 		Location centreLoc = centreChest.getLocation();
 		int cx = centreLoc.getBlockX();
 		int cy = centreLoc.getBlockY();
@@ -475,8 +487,8 @@ public class Main extends JavaPlugin implements Listener {
 		@Override
 		public void run() {
 			for(Quarry q : quarries)
-				if(q.markedForDeletion || !isQuarryLayout(q.centreChest)) {
-					q.clearPlatform();
+				if((q.markedForDeletion || !isQuarryLayout(q.centreChest)) && q.clearedPlatform) {
+					
 					q.tellOwner(configurableMessages.quarryDestroyedBeforeCoords() + " " + q.centreChestLocation.toVector().toString() + " " + configurableMessages.quarryDestroyedAfterCoords());
 					removeQuarry(q);
 					return;
@@ -487,6 +499,8 @@ public class Main extends JavaPlugin implements Listener {
 	public void loadConfig() {
 		String fileSeparator = System.getProperty("file.separator");
 		String path = "plugins" + fileSeparator + "QuarryCraft" + fileSeparator + "config.conf";
+		int latestVersion = 130;
+		String configVersion = null;
 		try {
 			BufferedReader inFile = new BufferedReader(new FileReader(path));
 			String currentString;
@@ -518,18 +532,60 @@ public class Main extends JavaPlugin implements Listener {
 				case "guidebook-cooldown-milliseconds":
 					guideBookCooldown = Long.parseLong(val);
 					break;
+				case "do-worldguard-protection":
+					if(val.equals("false") || val.equalsIgnoreCase("0")) doWGProtection = false;
+					break;
+				case "max-worldguard-y-check":
+					maxWGY = Integer.parseInt(val);
+					break;
+				case "min-worldguard-y-check":
+					minWGY = Integer.parseInt(val);
+					break;
+				case "version":
+					configVersion = val;
+					break;
 				}
 				
 			} while(currentString != null);
 			inFile.close();
+			
+			if(configVersion == null || Integer.parseInt(configVersion) != latestVersion ) {
+				String fileString = "";
+				fileString += "do-worldguard-protection = " + doWGProtection + "\n";  
+				fileString += "max-worldguard-y-check = " + maxWGY + "\n";
+				fileString += "min-worldguard-y-check = " + minWGY + "\n";
+				fileString += "quarries-per-player = " + quarryLimit + "\n\n";
+				fileString += "(Width and length below are multiplied to find the area, then quarry areas are checked against this)\n";
+				fileString += "max-quarry-width = " + maxQuarryWidth + "\n";
+				fileString += "max-quarry-length = " + maxQuarryLength + "\n";
+				fileString += "enable-quarrycraft-welcome-message = " + welcomeMessages + "\n\n";
+				fileString += "guidebook-cooldown-milliseconds = " + guideBookCooldown + "\n";
+				fileString += "version = " + latestVersion + "\n";
+				
+				
+				try {
+					FileOutputStream fos = new FileOutputStream(path);
+					fos.write(fileString.getBytes());
+					fos.flush();
+					fos.close();
+				} catch (IOException e1) {
+					//e1.printStackTrace();
+				}
+				
+				configurableMessages.overwriteCurrent();
+			}
 		} catch (IOException e) {
 			String fileString = "";
+			fileString += "do-worldguard-protection = " + doWGProtection + "\n";  
+			fileString += "max-worldguard-y-check = " + maxWGY + "\n";
+			fileString += "min-worldguard-y-check = " + minWGY + "\n";
 			fileString += "quarries-per-player = " + quarryLimit + "\n\n";
 			fileString += "(Width and length below are multiplied to find the area, then quarry areas are checked against this)\n";
 			fileString += "max-quarry-width = " + maxQuarryWidth + "\n";
 			fileString += "max-quarry-length = " + maxQuarryLength + "\n";
 			fileString += "enable-quarrycraft-welcome-message = " + welcomeMessages + "\n\n";
 			fileString += "guidebook-cooldown-milliseconds = " + guideBookCooldown + "\n";
+			fileString += "version = " + latestVersion + "\n";
 			
 			
 			try {

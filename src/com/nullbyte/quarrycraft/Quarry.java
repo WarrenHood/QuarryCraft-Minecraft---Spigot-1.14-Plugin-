@@ -16,6 +16,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.WorldGuard;
+import com.sk89q.worldguard.protection.flags.Flags;
+import com.sk89q.worldguard.protection.regions.RegionContainer;
+import com.sk89q.worldguard.protection.regions.RegionQuery;
+
 import net.md_5.bungee.api.ChatColor;
 
 public class Quarry extends BukkitRunnable {
@@ -40,6 +47,7 @@ public class Quarry extends BukkitRunnable {
 	int diamondBlocks = 0;
 	int goldBlocks = 0;
 	boolean platformDone;
+	boolean clearedPlatform;
 	int platX,platZ;
 	
 	private ArrayList<String> playersWithAccess;
@@ -72,6 +80,9 @@ public class Quarry extends BukkitRunnable {
 			nextY = centreChestLocation.getBlockY()-2;
 			nextZ = minZ;
 		}
+		if(Main.doWGProtection) doWGProtection();
+		if(Main.doGPProtection) doGPProtection();
+		clearedPlatform = false;
 		platX = minX-1;
 		platZ = minZ-1;
 		paused = false;
@@ -143,15 +154,62 @@ public class Quarry extends BukkitRunnable {
 		}
 	}
 	
+	public void movePlatformBreaker() {
+		if(clearedPlatform) return;
+		platX++;
+		if(platX > maxX+1) {
+			if(platZ < maxZ+1) {
+				platX = minX - 1;
+				platZ++;
+			}
+			else {
+				platX = maxX + 1;
+				clearedPlatform = true;
+			}
+		}
+	}
+	
 	public void resetPlatformCursor() {
 		platX = minX-1;
 		platZ = minZ-1;
 	}
 	
+	public void doWGProtection() {
+		if(Bukkit.getPluginManager().getPlugin("WorldGuard") == null) return;
+		if(Bukkit.getPlayer(owner) == null) return;
+		
+		if(!WorldGuardHandler.doWGProtection(world, minX, maxX, minZ, maxZ, owner)) {
+			paused = true;
+			markedForDeletion = true;
+			tellOwner(Main.configurableMessages.mayNotBuildHere());
+			return;
+		}
+	}
+	
+	public void doGPProtection() {
+		if(Bukkit.getPluginManager().getPlugin("GriefPrevention") == null) return;
+		if(Bukkit.getPlayer(owner) == null) return;
+		if(markedForDeletion) return;
+		
+		
+		Player p = Bukkit.getPlayer(owner);
+		
+		for(int x=minX-1; x<=maxX+1; x++) {
+			for(int z=minZ-1; z<= maxZ+1; z++) {
+				if(!GriefPreventionHandler.checkLocation(p, new Location(world, x, centreChestLocation.getBlockY()-1, z))) {
+					paused = true;
+					markedForDeletion = true;
+					tellOwner(Main.configurableMessages.mayNotBuildHere());
+					return;
+				}
+			}
+		}
+	}
+	
 	public void buildPlatform() {
 		if(platformDone) return;
 		Block currentBlock = world.getBlockAt(platX, centreChestLocation.getBlockY()-1, platZ);
-		while(!platformDone) {
+		for(int i=0; i<maxX-minX+1; i++) {
 			// Do borders and centres
 			if(platZ == minZ-1 || platZ == maxZ+1 || platX == minX-1 || platX == maxX+1 || (platZ >= centreChestLocation.getBlockZ()-3 && platZ <= centreChestLocation.getBlockZ()+3) || (platX >= centreChestLocation.getBlockX()-3 && platX <= centreChestLocation.getBlockX()+3)) {
 				currentBlock = world.getBlockAt(platX, centreChestLocation.getBlockY()-1, platZ);
@@ -202,14 +260,13 @@ public class Quarry extends BukkitRunnable {
 	}
 	
 	public void clearPlatform() {
-		for(int x=minX-1; x <=maxX+1; x++) {
-			for(int z=minZ-1; z<=maxZ+1; z++) {
-				Block currentBlock = world.getBlockAt(x,centreChestLocation.getBlockY()-1,z);
-				if(currentBlock.getType().equals(Material.BLACK_STAINED_GLASS) || currentBlock.getType().equals(Material.GREEN_STAINED_GLASS) || currentBlock.getType().equals(Material.CYAN_STAINED_GLASS) || currentBlock.getType().equals(Material.PURPLE_STAINED_GLASS) || currentBlock.getType().equals(Material.WHITE_STAINED_GLASS)) {
-					world.playSound(currentBlock.getLocation(), Sound.BLOCK_GLASS_BREAK, 1f, 1f);
-					currentBlock.setType(Material.AIR);
-				}
+		for(int i=0; i<maxX-minX+1; i++) {
+			Block currentBlock = world.getBlockAt(platX, centreChestLocation.getBlockY()-1, platZ);
+			if(currentBlock.getType().equals(Material.BLACK_STAINED_GLASS) || currentBlock.getType().equals(Material.GREEN_STAINED_GLASS) || currentBlock.getType().equals(Material.CYAN_STAINED_GLASS) || currentBlock.getType().equals(Material.PURPLE_STAINED_GLASS) || currentBlock.getType().equals(Material.WHITE_STAINED_GLASS)) {
+				world.playSound(currentBlock.getLocation(), Sound.BLOCK_GLASS_BREAK, 1f, 1f);
+				currentBlock.setType(Material.AIR);
 			}
+			movePlatformBreaker();
 		}
 	}
 	
@@ -312,7 +369,7 @@ public class Quarry extends BukkitRunnable {
 	}
 	
 	public boolean checkCentreChest() {
-		return world.getBlockAt(centreChestLocation) != null && world.getBlockAt(centreChestLocation).getType().equals(Material.CHEST);
+		return world.getBlockAt(centreChestLocation) != null && world.getBlockAt(centreChestLocation).getType().equals(Material.CHEST) && Main.isQuarryLayout(centreChest);
 	}
 	
 	public Location getLocation() {
@@ -324,7 +381,7 @@ public class Quarry extends BukkitRunnable {
 		classicMode = !classicMode;
 		resetMiningCursor();
 		resetPlatformCursor();
-		clearPlatform();
+		//clearPlatform();
 		platformDone = false;
 		if(classicMode) return Main.configurableMessages.miningModeToggled() + ": " + ChatColor.GREEN + Main.configurableMessages.classic();
 		return Main.configurableMessages.miningModeToggled() + ": "+ ChatColor.BLUE + Main.configurableMessages.ender();
@@ -711,6 +768,7 @@ public class Quarry extends BukkitRunnable {
 	}
 	
 	public void mineNextBlock() {
+		if(markedForDeletion) return;
 		Block blockToMine = findNextBlock();
 		
 		if(classicMode) {
@@ -843,10 +901,12 @@ public class Quarry extends BukkitRunnable {
 		}
 		else {
 			// This quarry should be removed from the world in some way
+			if(!markedForDeletion) resetPlatformCursor();
 			markedForDeletion = true;
 		}
 		
-		if(!platformDone /*&& nextY < centreChestLocation.getBlockY()-1*/) buildPlatform();
+		if(!markedForDeletion && !platformDone /*&& nextY < centreChestLocation.getBlockY()-1*/) buildPlatform();
+		if(markedForDeletion && !clearedPlatform) clearPlatform();
 		
 		
 		
