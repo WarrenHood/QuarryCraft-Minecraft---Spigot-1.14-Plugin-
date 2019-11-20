@@ -43,15 +43,18 @@ public class Main extends JavaPlugin implements Listener {
 	public static int maxQuarryLength = 50;
 	public static boolean welcomeMessages = true;
 	public static long guideBookCooldown = 1000*60*120;
+	
+	public static ConfigurableMessages configurableMessages;
 
 	class guideCommand implements CommandExecutor{
 
 		@Override
 		public boolean onCommand(CommandSender sender, Command cmd, String alias, String[] args) {
 			if(args.length == 1 && sender.isOp() && args[0].equals("reload")) {
-				sender.sendMessage(ChatColor.GREEN + "[QuarryCraft]" + ChatColor.WHITE + " Reloading QuarryCraft config...");
+				configurableMessages.loadMessages();
+				sender.sendMessage(configurableMessages.reloading1());
 				loadConfig();
-				sender.sendMessage(ChatColor.GREEN + "[QuarryCraft]" + ChatColor.WHITE + " Config reloaded");
+				sender.sendMessage(configurableMessages.reloading2());
 				return true;
 			}
 			
@@ -109,7 +112,7 @@ public class Main extends JavaPlugin implements Listener {
 			}
 			
 			else {
-				p.sendMessage(ChatColor.RED + "Please wait " + (long)(((double)(guideBookCooldown - getTimeSinceLastUse(p)))/1000.0) + " seconds before using that command again!" );
+				p.sendMessage(configurableMessages.pleaseWaitBeforeNumSeconds() + " " + (long)(((double)(guideBookCooldown - getTimeSinceLastUse(p)))/1000.0) +  " " + configurableMessages.pleaseWaitAfterNumSeconds());
 			}
 		}
 	}
@@ -143,14 +146,20 @@ public class Main extends JavaPlugin implements Listener {
 	
 	@EventHandler 
 	public void onPlayerJoin(PlayerJoinEvent e) {
-		if(welcomeMessages)
-			e.getPlayer().sendMessage(ChatColor.GREEN + "[QuarryCraft] " +ChatColor.WHITE + "Welcome " + e.getPlayer().getName() + "!\n" + ChatColor.GREEN + "[QuarryCraft] " +ChatColor.WHITE + "This server has QuarryCraft installed.\n" + ChatColor.GREEN + "[QuarryCraft] " +ChatColor.WHITE + "Type " + ChatColor.BLUE + "/quarrycraft guide" + ChatColor.WHITE + " to get started!");
+		if(welcomeMessages) {
+			e.getPlayer().sendMessage(configurableMessages.playerJoin1() + " " + e.getPlayer().getName());
+			e.getPlayer().sendMessage(configurableMessages.playerJoin2());
+			e.getPlayer().sendMessage(configurableMessages.playerJoin3());
+		}
+			
 	}
 	
 	@Override
 	public void onEnable() {
 		Bukkit.getServer().getPluginManager().registerEvents(this, this);
 		this.plugin = this;
+		configurableMessages = new ConfigurableMessages();
+		configurableMessages.loadMessages();
 		loadConfig();
 		gbGiver = new GuideBookGiver();
 		
@@ -191,12 +200,12 @@ public class Main extends JavaPlugin implements Listener {
 	public void onPlayerLeftClick(PlayerInteractEvent e) {
 		if(e.getAction().equals(Action.LEFT_CLICK_BLOCK) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
 			if(!canInteract(e.getClickedBlock().getLocation(), e.getPlayer())) {
-				e.getPlayer().sendMessage(ChatColor.DARK_RED + "You do not have permission to interact here.");
+				e.getPlayer().sendMessage(configurableMessages.dontHaveInteractPermission());
 				e.setCancelled(true);
 				return;
 			}
 			if(e.getAction().equals(Action.LEFT_CLICK_BLOCK) && !canBreak(e.getClickedBlock().getLocation(), e.getPlayer())) {
-				e.getPlayer().sendMessage(ChatColor.DARK_RED + "Sorry, this block may not be broken!");
+				e.getPlayer().sendMessage(configurableMessages.blockCannotBeBroken());
 				e.setCancelled(true);
 				return;
 			}
@@ -222,7 +231,7 @@ public class Main extends JavaPlugin implements Listener {
 				Chest centreChest = (Chest) clicked.getState();
 				if(isQuarryLayout(centreChest)) {
 					if(hasPermission(e.getPlayer(),"quarrycraft.buildquarries") && countQuarries(e.getPlayer()) < quarryLimit && addQuarry(centreChest, e.getPlayer().getName())) {
-						e.getPlayer().sendMessage(ChatColor.GREEN+ "You have created a new quarry.");
+						e.getPlayer().sendMessage(configurableMessages.quarryCreated());
 						e.setCancelled(true);
 					}
 					else if(getQuarry(centreChest) != null){
@@ -230,15 +239,15 @@ public class Main extends JavaPlugin implements Listener {
 						e.setCancelled(true);
 					}
 					else if(!hasPermission(e.getPlayer(),"quarrycraft.buildquarries")) {
-						e.getPlayer().sendMessage(ChatColor.RED + "You do not have permission to build quarries.\nPlease ask an OP for permission.");
+						e.getPlayer().sendMessage(configurableMessages.noBuildPerm());
 						e.setCancelled(true);
 					}
 					else if(countQuarries(e.getPlayer()) >= quarryLimit) {
-						e.getPlayer().sendMessage(ChatColor.DARK_RED + "You have reached your quarry limit("+quarryLimit+"). Please destroy old quarries or ask the server owner to change the limit in the QuarryCraft config.");
+						e.getPlayer().sendMessage(configurableMessages.quarryLimBeforeLimit()+quarryLimit+configurableMessages.quarryLimAfterLimit());
 						e.setCancelled(true);
 					}
 					else {
-						e.getPlayer().sendMessage(ChatColor.DARK_RED + "Quarries may not intersect!");
+						e.getPlayer().sendMessage(configurableMessages.quarryIntersectError());
 						e.setCancelled(true);
 					}
 					saveQuarries();
@@ -248,7 +257,7 @@ public class Main extends JavaPlugin implements Listener {
 				for(Quarry q : quarries) {
 					if(q.isIn3x3(clicked)) {
 						q.resetMiningCursor();
-						e.getPlayer().sendMessage("Mining cursor reset to y=" + ChatColor.DARK_GREEN + q.nextY);
+						e.getPlayer().sendMessage(configurableMessages.miningCursorReset() + " y=" + ChatColor.DARK_GREEN + q.nextY);
 						e.setCancelled(true);
 						return;
 					}
@@ -467,7 +476,7 @@ public class Main extends JavaPlugin implements Listener {
 			for(Quarry q : quarries)
 				if(q.markedForDeletion || !isQuarryLayout(q.centreChest)) {
 					q.clearPlatform();
-					q.tellOwner(ChatColor.DARK_RED + "Quarry at " + q.centreChestLocation.toVector().toString() + " destroyed");
+					q.tellOwner(configurableMessages.quarryDestroyedBeforeCoords() + " " + q.centreChestLocation.toVector().toString() + " " + configurableMessages.quarryDestroyedAfterCoords());
 					removeQuarry(q);
 					return;
 				}

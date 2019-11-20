@@ -57,7 +57,7 @@ public class Quarry extends BukkitRunnable {
 		storedEnergy = 0;
 		setBounds();
 		if(getArea() > Main.maxQuarryWidth*Main.maxQuarryLength) {
-			tellOwner(ChatColor.DARK_RED + "Your quarry is over the quarry area limit and is being restricted to a " + Main.maxQuarryWidth + "x" + Main.maxQuarryLength + " area.");
+			tellOwner(Main.configurableMessages.quarryOversizedBeforeArea() + " " + Main.maxQuarryWidth + "x" + Main.maxQuarryLength + " " + Main.configurableMessages.quarryOversizedAfterArea());
 			int xRad = (int)((Math.sqrt(Main.maxQuarryWidth*Main.maxQuarryLength)-1)/2);
 			int zRad = xRad;
 			int cx = centreChestLocation.getBlockX();
@@ -81,9 +81,9 @@ public class Quarry extends BukkitRunnable {
 	public void togglePause() {
 		paused = !paused;
 		if(paused)
-			tellOwner(ChatColor.YELLOW + "Your quarry at " + centreChestLocation.toVector().toString() + " has been paused.");
+			tellOwner(Main.configurableMessages.quarryPausedBeforeCoords() + " " +centreChestLocation.toVector().toString() + " " + Main.configurableMessages.quarryPausedAfterCoords());
 		else {
-			tellOwner(ChatColor.GREEN + "Your quarry at " + centreChestLocation.toVector().toString() + " is no longer paused.");
+			tellOwner(Main.configurableMessages.quarryUnpausedBeforeCoords() + " " + centreChestLocation.toVector().toString() + " " + Main.configurableMessages.quarryUnpausedAfterCoords());
 			alerted = false;
 		}
 			
@@ -93,13 +93,13 @@ public class Quarry extends BukkitRunnable {
 		paused = !paused;
 		
 		if(paused) {
-			p.sendMessage(ChatColor.YELLOW + "Your quarry at " + centreChestLocation.toVector().toString() + " has been paused.");
-			if(!isOwner(p)) tellOwner(ChatColor.YELLOW + "Your quarry at " + centreChestLocation.toVector().toString() + " has been paused.");
+			p.sendMessage(Main.configurableMessages.quarryPausedBeforeCoords() + " " + centreChestLocation.toVector().toString() + " " + Main.configurableMessages.quarryPausedAfterCoords());
+			if(!isOwner(p)) tellOwner(Main.configurableMessages.quarryPausedBeforeCoords() + " " + centreChestLocation.toVector().toString() + " " + Main.configurableMessages.quarryPausedAfterCoords());
 		}
 			
 		else {
-			p.sendMessage(ChatColor.GREEN + "Your quarry at " + centreChestLocation.toVector().toString() + " is no longer paused.");
-			if(!isOwner(p)) tellOwner(ChatColor.GREEN + "Your quarry at " + centreChestLocation.toVector().toString() + " is no longer paused.");
+			p.sendMessage(Main.configurableMessages.quarryUnpausedBeforeCoords() + " " + centreChestLocation.toVector().toString() + " " + Main.configurableMessages.quarryUnpausedAfterCoords());
+			if(!isOwner(p)) tellOwner(Main.configurableMessages.quarryUnpausedBeforeCoords() + " " + centreChestLocation.toVector().toString() + " " + Main.configurableMessages.quarryUnpausedAfterCoords());
 			alerted = false;
 		}
 			
@@ -284,27 +284,27 @@ public class Quarry extends BukkitRunnable {
 			if(emeraldBlocks == 76) emeraldsToNext = 0;
 			if(diamondBlocks == 36) diamondsToNext = 0;
 			
-			tellOwner("Your quarry has been modified:\nMining Delay: " + ChatColor.DARK_GREEN + miningDelay + ChatColor.WHITE + "\nEmerald blocks to next upgrade: " + ChatColor.GREEN + emeraldsToNext + ChatColor.WHITE + "\nBlocks mined at a time: " + ChatColor.DARK_BLUE + blocksPerTick + ChatColor.WHITE + "\nDiamond blocks to next upgrade: " + ChatColor.AQUA + diamondsToNext + ChatColor.WHITE + "\nEfficiency: "+ ChatColor.YELLOW + efficiency + "%"+ChatColor.WHITE +  "\nEnder mining replaces blocks with dirt: " + ChatColor.GOLD + enderReplaceDirt);
+			tellOwner(Main.configurableMessages.quarryModified() + "\n" +Main.configurableMessages.miningDelay() + ": " + ChatColor.DARK_GREEN + miningDelay + ChatColor.WHITE + "\n" + Main.configurableMessages.emeraldBlocksToUpgrade() + ": " + ChatColor.GREEN + emeraldsToNext + ChatColor.WHITE + "\n" + Main.configurableMessages.blocksMinedAtATime() + ": " + ChatColor.DARK_BLUE + blocksPerTick + ChatColor.WHITE + "\n" + Main.configurableMessages.diamondBlocksToUpgrade() + ": " +ChatColor.AQUA + diamondsToNext + ChatColor.WHITE + "\n" + Main.configurableMessages.efficiency() + ": "+ ChatColor.YELLOW + efficiency + "%"+ChatColor.WHITE +  "\n" + Main.configurableMessages.enderReplaceDirt() + ": " + ChatColor.GOLD + enderReplaceDirt);
 		}
 		
 	}
 	
 	public void sendProgress() {
 		if (finished)
-			tellOwner("The quarry is finished at y=" + ChatColor.DARK_BLUE + nextY);
+			tellOwner(Main.configurableMessages.quarryFinishedStatus() + " y=" + ChatColor.DARK_BLUE + nextY);
 		else if(!paused)
-			tellOwner("The quarry is mining at y=" + ChatColor.DARK_GREEN + nextY);
+			tellOwner(Main.configurableMessages.quarryMiningStatus() + " y=" + ChatColor.DARK_GREEN + nextY);
 		else
-			tellOwner("The quarry is paused at y=" + ChatColor.YELLOW + nextY);
+			tellOwner(Main.configurableMessages.quarryPausedStatus() + " y=" + ChatColor.YELLOW + nextY);
 	}
 	
 	public void sendProgress(Player p) {
 		if (finished)
-			p.sendMessage("The quarry is finished at y=" + ChatColor.DARK_BLUE + nextY);
+			p.sendMessage(Main.configurableMessages.quarryFinishedStatus() + " y=" + ChatColor.DARK_BLUE + nextY);
 		else if(!paused)
-			p.sendMessage("The quarry is mining at y=" + ChatColor.DARK_GREEN + nextY);
+			p.sendMessage(Main.configurableMessages.quarryMiningStatus() + " y=" + ChatColor.DARK_GREEN + nextY);
 		else
-			p.sendMessage("The quarry is paused at y=" + ChatColor.YELLOW + nextY);
+			p.sendMessage(Main.configurableMessages.quarryPausedStatus() + " y=" + ChatColor.YELLOW + nextY);
 	}
 	
 	public boolean isSameCentreChest(Chest someCentreChest) {
@@ -326,8 +326,8 @@ public class Quarry extends BukkitRunnable {
 		resetPlatformCursor();
 		clearPlatform();
 		platformDone = false;
-		if(classicMode) return "Mining mode toggled: "+ ChatColor.GREEN + "Classic";
-		return "Mining mode toggled: "+ ChatColor.BLUE + "Ender";
+		if(classicMode) return Main.configurableMessages.miningModeToggled() + ": " + ChatColor.GREEN + Main.configurableMessages.classic();
+		return Main.configurableMessages.miningModeToggled() + ": "+ ChatColor.BLUE + Main.configurableMessages.ender();
 	}
 	
 	public boolean isIn3x3(Block b) {
@@ -726,7 +726,7 @@ public class Quarry extends BukkitRunnable {
 				if(nextX == maxX && nextY == 0 && nextZ == maxZ && !alerted) {
 					alerted = true;
 					finished = true;
-					tellOwner(ChatColor.BLUE + "Your quarry at " + centreChestLocation.toVector().toString() + " is now finished");
+					tellOwner(ChatColor.BLUE + Main.configurableMessages.finishedBeforeCoords() + " " + centreChestLocation.toVector().toString() + " " + Main.configurableMessages.finishedAfterCoords());
 				} 
 					
 				return;
@@ -751,14 +751,14 @@ public class Quarry extends BukkitRunnable {
 					blockToMine.setType(Material.AIR);
 					if(alerted) {
 						alerted = false;
-						tellOwner(ChatColor.GREEN + "Your quarry at " + centreChestLocation.toVector().toString() + " has resumed working");
+						tellOwner(Main.configurableMessages.resumedBeforeCoords() + " " + centreChestLocation.toVector().toString() + " " + Main.configurableMessages.resumedAfterCoords());
 					}
 				}
 				else {
 					paused = true;
 					if(!alerted) {
 						alerted = true;
-						tellOwner(ChatColor.RED + "Your quarry at " + centreChestLocation.toVector().toString() + " has no space for new items and is now paused.");
+						tellOwner(Main.configurableMessages.noSpaceBeforeCoords() + " " + centreChestLocation.toVector().toString() + " " + Main.configurableMessages.noSpaceAfterCoords());
 					}
 				}
 			}
@@ -766,7 +766,7 @@ public class Quarry extends BukkitRunnable {
 				paused = true;
 				if(!alerted) {
 					alerted = true;
-					tellOwner(ChatColor.RED + "Your quarry at " + centreChestLocation.toVector().toString() + " has run out of fuel and is now paused.");
+					tellOwner(Main.configurableMessages.noFuelBeforeCoords() + " " + centreChestLocation.toVector().toString() + " " + Main.configurableMessages.noFuelAfterCoords());
 				}
 			}
 			
@@ -779,7 +779,7 @@ public class Quarry extends BukkitRunnable {
 				if(nextX == maxX && nextY == 0 && nextZ == maxZ && !alerted) {
 					alerted = true;
 					finished = true;
-					tellOwner(ChatColor.BLUE + "Your quarry at " + centreChestLocation.toVector().toString() + " is now finished");
+					tellOwner(Main.configurableMessages.finishedBeforeCoords() + " " + centreChestLocation.toVector().toString() + " " +Main.configurableMessages.finishedAfterCoords());
 				} 
 					
 				return;
@@ -808,14 +808,14 @@ public class Quarry extends BukkitRunnable {
 						blockToMine.setType(Material.AIR);
 					if(alerted) {
 						alerted = false;
-						tellOwner(ChatColor.GREEN + "Your quarry at " + centreChestLocation.toVector().toString() + " has resumed working");
+						tellOwner(Main.configurableMessages.resumedBeforeCoords() + " " + centreChestLocation.toVector().toString() + " " + Main.configurableMessages.resumedAfterCoords());
 					}
 				}
 				else {
 					paused = true;
 					if(!alerted) {
 						alerted = true;
-						tellOwner(ChatColor.RED + "Your quarry at " + centreChestLocation.toVector().toString() + " has no space for new items and is now paused.");
+						tellOwner(Main.configurableMessages.noSpaceBeforeCoords() + " " + centreChestLocation.toVector().toString() + " " + Main.configurableMessages.noSpaceAfterCoords());
 					}
 				}
 			}
@@ -823,7 +823,7 @@ public class Quarry extends BukkitRunnable {
 				paused = true;
 				if(!alerted) {
 					alerted = true;
-					tellOwner(ChatColor.RED + "Your quarry at " + centreChestLocation.toVector().toString() + " has run out of fuel and is now paused.");
+					tellOwner(Main.configurableMessages.noFuelBeforeCoords() + " " + centreChestLocation.toVector().toString() + " " + Main.configurableMessages.noFuelAfterCoords());
 				}
 			}
 		}
