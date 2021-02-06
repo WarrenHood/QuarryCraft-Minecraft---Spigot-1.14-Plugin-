@@ -12,9 +12,9 @@ Firstly, place down a chest one block above the level at which you want to start
 Then place a diamond block against each side face of the chest to get a cross.
 
 
-Next, fill the 4 open corners with redston blocks.
+Next, fill the 4 open corners with redstone blocks.
 
-Next, you may place iron bars heading staight out in the north,south, west and/or east direction. Starting from the side of each diamond block.
+Next, you may place iron bars heading straight out in the north, south, west and/or east direction. Starting from the side of each diamond block.
 
 The 2 longest perpendicular bars will be used to determine the area which your quarry will mine.
 
