@@ -1,13 +1,15 @@
 name: QuarryCraft
-version: 1.4.1
+version: 1.4.2
 main: com.nullbyte.quarrycraft.Main
 api-version: 1.13
-softdepend: [WorldGuard]
-softdepend: [GriefPrevention]
+softdepend: [WorldGuard, GriefPrevention]
 commands:
    quarrycraft:
       guide:
          description: Gives the player a QuarryCraft guide book
+      trust:
+         usage: /quarrycraft trust <player> 
+         description: Trust a player to let them access one of your quarry. To do this you must be standing on your quarry chest!
 permissions:
    quarrycraft.*:
       description: Grants all quarrycraft permissions

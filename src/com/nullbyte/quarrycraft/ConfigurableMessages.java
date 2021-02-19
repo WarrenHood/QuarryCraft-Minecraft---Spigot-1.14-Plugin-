@@ -8,7 +8,7 @@ import java.io.IOException;
 import org.bukkit.ChatColor;
 
 public class ConfigurableMessages {
-	
+
 	private String reloading1;
 	private String reloading2;
 	private String pleaseWaitBeforeNumSeconds;
@@ -54,7 +54,7 @@ public class ConfigurableMessages {
 	private String playerJoin2;
 	private String playerJoin3;
 	private String mayNotBuildHere;
-	
+
 	public ConfigurableMessages() {
 		reloading1 = ChatColor.GREEN + "[QuarryCraft]" + ChatColor.WHITE + " Reloading QuarryCraft config...";
 		reloading2 = ChatColor.GREEN + "[QuarryCraft]" + ChatColor.WHITE + " Config reloaded";
@@ -62,7 +62,7 @@ public class ConfigurableMessages {
 		pleaseWaitAfterNumSeconds = "seconds before using that command again!";
 		dontHaveInteractPermission = ChatColor.DARK_RED + "You do not have permission to interact here.";
 		blockCannotBeBroken = ChatColor.DARK_RED + "Sorry, this block may not be broken!";
-		quarryCreated = ChatColor.GREEN+ "You have created a new quarry.";
+		quarryCreated = ChatColor.GREEN + "You have created a new quarry.";
 		noBuildPerm = ChatColor.RED + "You do not have permission to build quarries.\nPlease ask an OP for permission.";
 		quarryLimBeforeLimit = ChatColor.DARK_RED + "You have reached your quarry limit(";
 		quarryLimAfterLimit = "). Please destroy old quarries or ask the server owner to change the limit in the QuarryCraft config.";
@@ -97,155 +97,197 @@ public class ConfigurableMessages {
 		noFuelAfterCoords = " has run out of fuel and is now paused.";
 		finishedBeforeCoords = ChatColor.BLUE + "Your quarry at ";
 		finishedAfterCoords = " is now finished";
-		playerJoin1 = ChatColor.GREEN + "[QuarryCraft] " +ChatColor.WHITE + "Welcome ";
-		playerJoin2 = ChatColor.GREEN + "[QuarryCraft] " +ChatColor.WHITE + "This server has QuarryCraft installed.";
-		playerJoin3 = ChatColor.GREEN + "[QuarryCraft] " +ChatColor.WHITE + "Type " + ChatColor.BLUE + "/quarrycraft guide" + ChatColor.WHITE + " to get started!";
+		playerJoin1 = ChatColor.GREEN + "[QuarryCraft] " + ChatColor.WHITE + "Welcome ";
+		playerJoin2 = ChatColor.GREEN + "[QuarryCraft] " + ChatColor.WHITE + "This server has QuarryCraft installed.";
+		playerJoin3 = ChatColor.GREEN + "[QuarryCraft] " + ChatColor.WHITE + "Type " + ChatColor.BLUE + "/quarrycraft guide" + ChatColor.WHITE + " to get started!";
 		mayNotBuildHere = ChatColor.RED + "You may not build your quarry here!";
-		//loadMessages();
+		// loadMessages();
 	}
-	
-	
-	
-	public String reloading1(){
-    return reloading1;
-  }
-  public String reloading2(){
-    return reloading2;
-  }
-  public String pleaseWaitBeforeNumSeconds(){
-    return pleaseWaitBeforeNumSeconds;
-  }
-  public String pleaseWaitAfterNumSeconds(){
-    return pleaseWaitAfterNumSeconds;
-  }
-  public String dontHaveInteractPermission(){
-    return dontHaveInteractPermission;
-  }
-  public String blockCannotBeBroken(){
-    return blockCannotBeBroken;
-  }
-  public String quarryCreated(){
-    return quarryCreated;
-  }
-  public String noBuildPerm(){
-    return noBuildPerm;
-  }
-  public String quarryLimBeforeLimit(){
-    return quarryLimBeforeLimit;
-  }
-  public String quarryLimAfterLimit(){
-    return quarryLimAfterLimit;
-  }
-  public String quarryIntersectError(){
-    return quarryIntersectError;
-  }
-  public String miningCursorReset(){
-    return miningCursorReset;
-  }
-  public String quarryDestroyedBeforeCoords(){
-    return quarryDestroyedBeforeCoords;
-  }
-  public String quarryDestroyedAfterCoords(){
-    return quarryDestroyedAfterCoords;
-  }
-  public String quarryOversizedBeforeArea(){
-    return quarryOversizedBeforeArea;
-  }
-  public String quarryOversizedAfterArea(){
-    return quarryOversizedAfterArea;
-  }
-  public String quarryPausedBeforeCoords(){
-    return quarryPausedBeforeCoords;
-  }
-  public String quarryPausedAfterCoords(){
-    return quarryPausedAfterCoords;
-  }
-  public String quarryUnpausedBeforeCoords(){
-    return quarryUnpausedBeforeCoords;
-  }
-  public String quarryUnpausedAfterCoords(){
-    return quarryUnpausedAfterCoords;
-  }
-  public String quarryModified(){
-    return quarryModified;
-  }
-  public String miningDelay(){
-    return miningDelay;
-  }
-  public String emeraldBlocksToUpgrade(){
-    return emeraldBlocksToUpgrade;
-  }
-  public String blocksMinedAtATime(){
-    return blocksMinedAtATime;
-  }
-  public String diamondBlocksToUpgrade(){
-    return diamondBlocksToUpgrade;
-  }
-  public String efficiency(){
-    return efficiency;
-  }
-  public String enderReplaceDirt(){
-    return enderReplaceDirt;
-  }
-  public String quarryFinishedStatus(){
-    return quarryFinishedStatus;
-  }
-  public String quarryMiningStatus(){
-    return quarryMiningStatus;
-  }
-  public String quarryPausedStatus(){
-    return quarryPausedStatus;
-  }
-  public String miningModeToggled(){
-    return miningModeToggled;
-  }
-  public String classic(){
-    return classic;
-  }
-  public String ender(){
-    return ender;
-  }
-  public String resumedBeforeCoords(){
-    return resumedBeforeCoords;
-  }
-  public String resumedAfterCoords(){
-    return resumedAfterCoords;
-  }
-  public String noSpaceBeforeCoords(){
-    return noSpaceBeforeCoords;
-  }
-  public String noSpaceAfterCoords(){
-    return noSpaceAfterCoords;
-  }
-  public String noFuelBeforeCoords(){
-    return noFuelBeforeCoords;
-  }
-  public String noFuelAfterCoords(){
-    return noFuelAfterCoords;
-  }
-  public String finishedBeforeCoords(){
-    return finishedBeforeCoords;
-  }
-  public String finishedAfterCoords(){
-    return finishedAfterCoords;
-  }
-  public String playerJoin1(){
-    return playerJoin1;
-  }
-  public String playerJoin2(){
-    return playerJoin2;
-  }
-  public String playerJoin3(){
-    return playerJoin3;
-  }
-  public String mayNotBuildHere() {
-    return mayNotBuildHere;
-  }
-	
-  public void overwriteCurrent() {
-	  String fileSeparator = System.getProperty("file.separator");
-	  String path = "plugins" + fileSeparator + "QuarryCraft" + fileSeparator + "messages.conf";
-	  String fileString = "";
+
+	public String reloading1() {
+		return reloading1;
+	}
+
+	public String reloading2() {
+		return reloading2;
+	}
+
+	public String pleaseWaitBeforeNumSeconds() {
+		return pleaseWaitBeforeNumSeconds;
+	}
+
+	public String pleaseWaitAfterNumSeconds() {
+		return pleaseWaitAfterNumSeconds;
+	}
+
+	public String dontHaveInteractPermission() {
+		return dontHaveInteractPermission;
+	}
+
+	public String blockCannotBeBroken() {
+		return blockCannotBeBroken;
+	}
+
+	public String quarryCreated() {
+		return quarryCreated;
+	}
+
+	public String noBuildPerm() {
+		return noBuildPerm;
+	}
+
+	public String quarryLimBeforeLimit() {
+		return quarryLimBeforeLimit;
+	}
+
+	public String quarryLimAfterLimit() {
+		return quarryLimAfterLimit;
+	}
+
+	public String quarryIntersectError() {
+		return quarryIntersectError;
+	}
+
+	public String miningCursorReset() {
+		return miningCursorReset;
+	}
+
+	public String quarryDestroyedBeforeCoords() {
+		return quarryDestroyedBeforeCoords;
+	}
+
+	public String quarryDestroyedAfterCoords() {
+		return quarryDestroyedAfterCoords;
+	}
+
+	public String quarryOversizedBeforeArea() {
+		return quarryOversizedBeforeArea;
+	}
+
+	public String quarryOversizedAfterArea() {
+		return quarryOversizedAfterArea;
+	}
+
+	public String quarryPausedBeforeCoords() {
+		return quarryPausedBeforeCoords;
+	}
+
+	public String quarryPausedAfterCoords() {
+		return quarryPausedAfterCoords;
+	}
+
+	public String quarryUnpausedBeforeCoords() {
+		return quarryUnpausedBeforeCoords;
+	}
+
+	public String quarryUnpausedAfterCoords() {
+		return quarryUnpausedAfterCoords;
+	}
+
+	public String quarryModified() {
+		return quarryModified;
+	}
+
+	public String miningDelay() {
+		return miningDelay;
+	}
+
+	public String emeraldBlocksToUpgrade() {
+		return emeraldBlocksToUpgrade;
+	}
+
+	public String blocksMinedAtATime() {
+		return blocksMinedAtATime;
+	}
+
+	public String diamondBlocksToUpgrade() {
+		return diamondBlocksToUpgrade;
+	}
+
+	public String efficiency() {
+		return efficiency;
+	}
+
+	public String enderReplaceDirt() {
+		return enderReplaceDirt;
+	}
+
+	public String quarryFinishedStatus() {
+		return quarryFinishedStatus;
+	}
+
+	public String quarryMiningStatus() {
+		return quarryMiningStatus;
+	}
+
+	public String quarryPausedStatus() {
+		return quarryPausedStatus;
+	}
+
+	public String miningModeToggled() {
+		return miningModeToggled;
+	}
+
+	public String classic() {
+		return classic;
+	}
+
+	public String ender() {
+		return ender;
+	}
+
+	public String resumedBeforeCoords() {
+		return resumedBeforeCoords;
+	}
+
+	public String resumedAfterCoords() {
+		return resumedAfterCoords;
+	}
+
+	public String noSpaceBeforeCoords() {
+		return noSpaceBeforeCoords;
+	}
+
+	public String noSpaceAfterCoords() {
+		return noSpaceAfterCoords;
+	}
+
+	public String noFuelBeforeCoords() {
+		return noFuelBeforeCoords;
+	}
+
+	public String noFuelAfterCoords() {
+		return noFuelAfterCoords;
+	}
+
+	public String finishedBeforeCoords() {
+		return finishedBeforeCoords;
+	}
+
+	public String finishedAfterCoords() {
+		return finishedAfterCoords;
+	}
+
+	public String playerJoin1() {
+		return playerJoin1;
+	}
+
+	public String playerJoin2() {
+		return playerJoin2;
+	}
+
+	public String playerJoin3() {
+		return playerJoin3;
+	}
+
+	public String mayNotBuildHere() {
+		return mayNotBuildHere;
+	}
+
+	public void overwriteCurrent() {
+		String fileSeparator = System.getProperty("file.separator");
+		String path = "plugins" + fileSeparator + "QuarryCraft" + fileSeparator + "messages.conf";
+		String fileString = "";
 		fileString += "reloading1 = " + reloading1 + "\n";
 		fileString += "reloading2 = " + reloading2 + "\n";
 		fileString += "pleaseWaitBeforeNumSeconds = " + pleaseWaitBeforeNumSeconds + "\n";
@@ -291,18 +333,17 @@ public class ConfigurableMessages {
 		fileString += "playerJoin2 = " + playerJoin2 + "\n";
 		fileString += "playerJoin3 = " + playerJoin3 + "\n";
 		fileString += "mayNotBuildHere = " + mayNotBuildHere + "\n";
-		
-		
+
 		try {
 			FileOutputStream fos = new FileOutputStream(path);
 			fos.write(fileString.getBytes());
 			fos.flush();
 			fos.close();
 		} catch (IOException e1) {
-			//e1.printStackTrace();
+			// e1.printStackTrace();
 		}
-  }
-  
+	}
+
 	public void loadMessages() {
 		String fileSeparator = System.getProperty("file.separator");
 		String path = "plugins" + fileSeparator + "QuarryCraft" + fileSeparator + "messages.conf";
@@ -311,163 +352,165 @@ public class ConfigurableMessages {
 			String currentString;
 			String[] splitString;
 			String var;
-			String val; 
+			String val;
 			do {
 				currentString = inFile.readLine();
-				if(currentString == null) break;
+				if (currentString == null)
+					break;
 				splitString = currentString.split("=");
-				if(splitString == null || splitString.length != 2) continue;
+				if (splitString == null || splitString.length != 2)
+					continue;
 				var = splitString[0].trim();
-				val = splitString[1].trim();
-				
-				//System.out.println(ChatColor.GREEN + "Loading configurable message" + var + " = " + val);
-				
-				switch(var) {
+				val = Main.getPlugin(Main.class).translateColors(splitString[1].trim());
+
+				// System.out.println(ChatColor.GREEN + "Loading configurable message" + var + " = " + val);
+
+				switch (var) {
 				case "reloading1":
-				  reloading1 = val;
-				  break;
+					reloading1 = val;
+					break;
 				case "reloading2":
-				  reloading2 = val;
-				  break;
+					reloading2 = val;
+					break;
 				case "pleaseWaitBeforeNumSeconds":
-				  pleaseWaitBeforeNumSeconds = val;
-				  break;
+					pleaseWaitBeforeNumSeconds = val;
+					break;
 				case "pleaseWaitAfterNumSeconds":
-				  pleaseWaitAfterNumSeconds = val;
-				  break;
+					pleaseWaitAfterNumSeconds = val;
+					break;
 				case "dontHaveInteractPermission":
-				  dontHaveInteractPermission = val;
-				  break;
+					dontHaveInteractPermission = val;
+					break;
 				case "blockCannotBeBroken":
-				  blockCannotBeBroken = val;
-				  break;
+					blockCannotBeBroken = val;
+					break;
 				case "quarryCreated":
-				  quarryCreated = val;
-				  break;
+					quarryCreated = val;
+					break;
 				case "noBuildPerm":
-				  noBuildPerm = val;
-				  break;
+					noBuildPerm = val;
+					break;
 				case "quarryLimBeforeLimit":
-				  quarryLimBeforeLimit = val;
-				  break;
+					quarryLimBeforeLimit = val;
+					break;
 				case "quarryLimAfterLimit":
-				  quarryLimAfterLimit = val;
-				  break;
+					quarryLimAfterLimit = val;
+					break;
 				case "quarryIntersectError":
-				  quarryIntersectError = val;
-				  break;
+					quarryIntersectError = val;
+					break;
 				case "miningCursorReset":
-				  miningCursorReset = val;
-				  break;
+					miningCursorReset = val;
+					break;
 				case "quarryDestroyedBeforeCoords":
-				  quarryDestroyedBeforeCoords = val;
-				  break;
+					quarryDestroyedBeforeCoords = val;
+					break;
 				case "quarryDestroyedAfterCoords":
-				  quarryDestroyedAfterCoords = val;
-				  break;
+					quarryDestroyedAfterCoords = val;
+					break;
 				case "quarryOversizedBeforeArea":
-				  quarryOversizedBeforeArea = val;
-				  break;
+					quarryOversizedBeforeArea = val;
+					break;
 				case "quarryOversizedAfterArea":
-				  quarryOversizedAfterArea = val;
-				  break;
+					quarryOversizedAfterArea = val;
+					break;
 				case "quarryPausedBeforeCoords":
-				  quarryPausedBeforeCoords = val;
-				  break;
+					quarryPausedBeforeCoords = val;
+					break;
 				case "quarryPausedAfterCoords":
-				  quarryPausedAfterCoords = val;
-				  break;
+					quarryPausedAfterCoords = val;
+					break;
 				case "quarryUnpausedBeforeCoords":
-				  quarryUnpausedBeforeCoords = val;
-				  break;
+					quarryUnpausedBeforeCoords = val;
+					break;
 				case "quarryUnpausedAfterCoords":
-				  quarryUnpausedAfterCoords = val;
-				  break;
+					quarryUnpausedAfterCoords = val;
+					break;
 				case "quarryModified":
-				  quarryModified = val;
-				  break;
+					quarryModified = val;
+					break;
 				case "miningDelay":
-				  miningDelay = val;
-				  break;
+					miningDelay = val;
+					break;
 				case "emeraldBlocksToUpgrade":
-				  emeraldBlocksToUpgrade = val;
-				  break;
+					emeraldBlocksToUpgrade = val;
+					break;
 				case "blocksMinedAtATime":
-				  blocksMinedAtATime = val;
-				  break;
+					blocksMinedAtATime = val;
+					break;
 				case "diamondBlocksToUpgrade":
-				  diamondBlocksToUpgrade = val;
-				  break;
+					diamondBlocksToUpgrade = val;
+					break;
 				case "efficiency":
-				  efficiency = val;
-				  break;
+					efficiency = val;
+					break;
 				case "enderReplaceDirt":
-				  enderReplaceDirt = val;
-				  break;
+					enderReplaceDirt = val;
+					break;
 				case "quarryFinishedStatus":
-				  quarryFinishedStatus = val;
-				  break;
+					quarryFinishedStatus = val;
+					break;
 				case "quarryMiningStatus":
-				  quarryMiningStatus = val;
-				  break;
+					quarryMiningStatus = val;
+					break;
 				case "quarryPausedStatus":
-				  quarryPausedStatus = val;
-				  break;
+					quarryPausedStatus = val;
+					break;
 				case "miningModeToggled":
-				  miningModeToggled = val;
-				  break;
+					miningModeToggled = val;
+					break;
 				case "classic":
-				  classic = val;
-				  break;
+					classic = val;
+					break;
 				case "ender":
-				  ender = val;
-				  break;
+					ender = val;
+					break;
 				case "resumedBeforeCoords":
-				  resumedBeforeCoords = val;
-				  break;
+					resumedBeforeCoords = val;
+					break;
 				case "resumedAfterCoords":
-				  resumedAfterCoords = val;
-				  break;
+					resumedAfterCoords = val;
+					break;
 				case "noSpaceBeforeCoords":
-				  noSpaceBeforeCoords = val;
-				  break;
+					noSpaceBeforeCoords = val;
+					break;
 				case "noSpaceAfterCoords":
-				  noSpaceAfterCoords = val;
-				  break;
+					noSpaceAfterCoords = val;
+					break;
 				case "noFuelBeforeCoords":
-				  noFuelBeforeCoords = val;
-				  break;
+					noFuelBeforeCoords = val;
+					break;
 				case "noFuelAfterCoords":
-				  noFuelAfterCoords = val;
-				  break;
+					noFuelAfterCoords = val;
+					break;
 				case "finishedBeforeCoords":
-				  finishedBeforeCoords = val;
-				  break;
+					finishedBeforeCoords = val;
+					break;
 				case "finishedAfterCoords":
-				  finishedAfterCoords = val;
-				  break;
+					finishedAfterCoords = val;
+					break;
 				case "playerJoin1":
-				  playerJoin1 = val;
-				  break;
+					playerJoin1 = val;
+					break;
 				case "playerJoin2":
-				  playerJoin2 = val;
-				  break;
+					playerJoin2 = val;
+					break;
 				case "playerJoin3":
-				  playerJoin3 = val;
-				  break;
+					playerJoin3 = val;
+					break;
 				case "mayNotBuildHere":
-				  mayNotBuildHere = val;
-				  break;
+					mayNotBuildHere = val;
+					break;
 				default:
-			      System.out.println(var + " unrecognised! Ignoring"); 
-			      break;
+					System.out.println(var + " unrecognised! Ignoring");
+					break;
 				}
-				
-			} while(currentString != null);
+
+			} while (currentString != null);
 			inFile.close();
 		} catch (IOException e) {
-			//e.printStackTrace();
-			//System.out.println(ChatColor.BLUE + "Generating QuarryCraft messages file");
+			// e.printStackTrace();
+			// System.out.println(ChatColor.BLUE + "Generating QuarryCraft messages file");
 			String fileString = "";
 			fileString += "reloading1 = " + reloading1 + "\n";
 			fileString += "reloading2 = " + reloading2 + "\n";
@@ -514,17 +557,16 @@ public class ConfigurableMessages {
 			fileString += "playerJoin2 = " + playerJoin2 + "\n";
 			fileString += "playerJoin3 = " + playerJoin3 + "\n";
 			fileString += "mayNotBuildHere = " + mayNotBuildHere + "\n";
-			
-			
+
 			try {
 				FileOutputStream fos = new FileOutputStream(path);
 				fos.write(fileString.getBytes());
 				fos.flush();
 				fos.close();
 			} catch (IOException e1) {
-				//e1.printStackTrace();
+				// e1.printStackTrace();
 			}
 		}
 	}
-	
+
 }
